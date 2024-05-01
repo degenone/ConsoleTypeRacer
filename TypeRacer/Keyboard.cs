@@ -1,7 +1,8 @@
 ﻿using System.Collections.Immutable;
+using System.Security.Cryptography;
 
 namespace TypeRacer;
-public static class Keyboard
+internal class Keyboard(int Offset)
 {
     public const int Width = 68;
 
@@ -66,42 +67,57 @@ public static class Keyboard
             KeyValuePair.Create<ConsoleKey, Key>(ConsoleKey.Spacebar, new(['S', 'p', 'a', 'c', 'e'], 21, 4)),
         });
 
-    public static void Print(int center, int offset)
+    private readonly (Key key, bool shift)[] _history = new (Key, bool)[5];
+    private readonly ConsoleColor[] _historyColors = [ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.DarkYellow, ConsoleColor.Magenta, ConsoleColor.DarkBlue];
+
+    public void Print()
     {
+        int center = Console.WindowWidth / 2;
         foreach (var key in Keys.Values)
         {
             int col = center - Width / 2 + key.Column;
-            Console.SetCursorPosition(col, key.Row + offset);
+            Console.SetCursorPosition(col, key.Row + Offset);
             Console.Write(key.Chars);
         }
     }
 
-    public static void Highlight(ConsoleKey pressed, bool shift, int center, int offset)
+    public void AddKey(ConsoleKey pressed, bool shift)
     {
-        if (Keys.TryGetValue(pressed, out Key? key))
+        if (Keys.TryGetValue(pressed, out Key? key)) 
         {
-            int col = center - Width / 2 + key.Column;
-            if (shift && key.Chars.Length == 2) col++;
-            Console.SetCursorPosition(col, key.Row + offset);
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.Write(KeyToString(key, shift));
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
+            var last = _history[^1];
+            if (last.key is not null) Unhighlight(last.key, last.shift);
+            for (int i = _history.Length - 1; i > 0; i--)
+            {
+                _history[i] = _history[i - 1];
+                if (_history[i].key is not null)
+                    Highlight(_history[i].key, _history[i].shift, i);
+            }
+            _history[0] = (key, shift);
+            Highlight(key, shift, 0);
         }
     }
 
-    public static void Unhighlight(ConsoleKey pressed, bool shift, int center, int offset)
+    private void Highlight(Key key, bool shift, int colorIndex)
     {
-        if (Keys.TryGetValue(pressed, out Key? key))
-        {
-            int col = center - Width / 2 + key.Column;
-            if (shift && key.Chars.Length == 2) col++;
-            Console.SetCursorPosition(col, key.Row + offset);
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(KeyToString(key, shift));
-        }
+        int center = Console.WindowWidth / 2;
+        int col = center - Width / 2 + key.Column;
+        if (shift && key.Chars.Length == 2) col++;
+        Console.SetCursorPosition(col, key.Row + Offset);
+        Console.BackgroundColor = _historyColors[colorIndex];
+        Console.ForegroundColor = ConsoleColor.Black;
+        Console.Write(KeyToString(key, shift));
+        Console.ResetColor();
+    }
+
+    private void Unhighlight(Key key, bool shift)
+    {
+        int center = Console.WindowWidth / 2;
+        int col = center - Width / 2 + key.Column;
+        if (shift && key.Chars.Length == 2) col++;
+        Console.SetCursorPosition(col, key.Row + Offset);
+        Console.ResetColor();
+        Console.Write(KeyToString(key, shift));
     }
 
     private static string KeyToString(Key key, bool shift)
