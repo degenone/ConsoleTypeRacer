@@ -99,7 +99,7 @@ internal class Keyboard(int Offset)
     public bool RegisterPress(ConsoleKey pressed, bool shift)
     {
         bool found = Keys.TryGetValue(pressed, out Key? key);
-        if (found && key is not null) 
+        if (found && key is not null)
         {
             var last = _history[^1];
             if (last.key is not null) Unhighlight(last.key, last.shift);

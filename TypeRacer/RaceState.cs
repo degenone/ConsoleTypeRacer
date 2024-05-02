@@ -29,8 +29,9 @@ internal class RaceState
     private string[] _text;
     private readonly List<string> _lines = [];
     private readonly List<char> _typed = [];
-    private List<int> _errorsAt = [];
+    private readonly List<int> _errorsAt = [];
     private readonly int _rowOffset;
+    private int _errorsMade = 0;
     private int _totalChars = 0;
     private int _currentPosition = 0;
     private int _currentLine = 0;
@@ -61,9 +62,24 @@ internal class RaceState
 
     public void AddChar(char ch)
     {
-        // TODO: - Handle Tab
+        // TODO: If Tab is used incorrectly it can count upto 4 errors when it should be 1.
+        if (ch == '\t')
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                AddChar(' ');
+            }
+            return;
+        }
+
         _typed.Add(ch);
         Highlight();
+
+        if (!(ch == _lines[_currentLine][_currentPosition]))
+        {
+            _errorsAt.Add(_typed.Count - 1);
+            _errorsMade++;
+        }
 
         _currentPosition++;
         if (_currentPosition >= _lines[_currentLine].Length)
@@ -129,12 +145,6 @@ internal class RaceState
             Console.ForegroundColor = correct ? ConsoleColor.Green : ConsoleColor.Red;
         }
         Console.Write(ch);
-
-        if (!correct)
-        {
-            _errorsAt.Add(_typed.Count - 1);
-        }
-
         Console.ResetColor();
     }
 
