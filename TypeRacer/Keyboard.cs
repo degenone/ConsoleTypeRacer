@@ -4,8 +4,6 @@ using System.Security.Cryptography;
 namespace TypeRacer;
 internal class Keyboard(int Offset)
 {
-    public const int Width = 68;
-
     public static readonly ImmutableDictionary<ConsoleKey, Key> Keys = ImmutableDictionary.CreateRange(
         new KeyValuePair<ConsoleKey, Key>[] {
             // Row 0
@@ -67,6 +65,7 @@ internal class Keyboard(int Offset)
             KeyValuePair.Create<ConsoleKey, Key>(ConsoleKey.Spacebar, new(['S', 'p', 'a', 'c', 'e'], 21, 4)),
         });
 
+    private const int Width = 62;
     private readonly (Key key, bool shift)[] _history = new (Key, bool)[5];
     private readonly ConsoleColor[] _historyColors = [ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.DarkYellow, ConsoleColor.Magenta, ConsoleColor.DarkBlue];
 
@@ -79,11 +78,28 @@ internal class Keyboard(int Offset)
             Console.SetCursorPosition(col, key.Row + Offset);
             Console.Write(key.Chars);
         }
+        (int _, int top) = Console.GetCursorPosition();
+        Console.SetCursorPosition(center - Width / 2, top + 2);
+        Console.Write("History: most recent ");
+        for (int i = 0; i < _historyColors.Length; i++)
+        {
+            ConsoleColor color = _historyColors[i];
+            Console.BackgroundColor = color;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.Write(i);
+            Console.ResetColor();
+            Console.Write(" ");
+        }
+        Console.ResetColor();
+        Console.Write("oldest");
+        //Console.SetCursorPosition(center - Width / 2, top + 3);
+        //Console.Write(new string('-', Width));
     }
 
-    public void AddKey(ConsoleKey pressed, bool shift)
+    public bool RegisterPress(ConsoleKey pressed, bool shift)
     {
-        if (Keys.TryGetValue(pressed, out Key? key)) 
+        bool found = Keys.TryGetValue(pressed, out Key? key);
+        if (found && key is not null) 
         {
             var last = _history[^1];
             if (last.key is not null) Unhighlight(last.key, last.shift);
@@ -96,6 +112,7 @@ internal class Keyboard(int Offset)
             _history[0] = (key, shift);
             Highlight(key, shift, 0);
         }
+        return found;
     }
 
     private void Highlight(Key key, bool shift, int colorIndex)

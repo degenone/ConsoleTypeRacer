@@ -29,12 +29,11 @@ internal class RaceState
     private string[] _text;
     private readonly List<string> _lines = [];
     private readonly List<char> _typed = [];
+    private List<int> _errorsAt = [];
     private readonly int _rowOffset;
     private int _totalChars = 0;
     private int _currentPosition = 0;
     private int _currentLine = 0;
-
-    public bool LastWordCorrect { get; private set; } = true;
 
     public bool IsFinished { get; private set; } = false;
 
@@ -62,6 +61,7 @@ internal class RaceState
 
     public void AddChar(char ch)
     {
+        // TODO: - Handle Tab
         _typed.Add(ch);
         Highlight();
 
@@ -73,6 +73,46 @@ internal class RaceState
         }
 
         if (_totalChars == _typed.Count) IsFinished = true;
+    }
+
+    public void RemoveChar()
+    {
+        if (_typed.Count == 0) return;
+        if (_errorsAt.Count == 0 && _typed[^1] == ' ') return;
+
+        _typed.RemoveAt(_typed.Count - 1);
+        if (_errorsAt.Count > 0 && _errorsAt[^1] == _typed.Count)
+        {
+            _errorsAt.RemoveAt(_errorsAt.Count - 1);
+        }
+
+        _currentPosition--;
+        if (_currentPosition < 0)
+        {
+            _currentLine--;
+            _currentPosition = _lines[_currentLine].Length - 1;
+        }
+
+        Unhighlight();
+    }
+
+    public void RemoveWord()
+    {
+        if (_typed.Count == 0) return;
+        if (_typed[^1] == ' ')
+        {
+            while (_typed.Count > 0 && _errorsAt.Count > 0 && _typed[^1] == ' ')
+            {
+                RemoveChar();
+            }
+        }
+        else
+        {
+            while (_typed.Count > 0 && _typed[^1] != ' ')
+            {
+                RemoveChar();
+            }
+        }
     }
 
     private void Highlight()
@@ -89,12 +129,19 @@ internal class RaceState
             Console.ForegroundColor = correct ? ConsoleColor.Green : ConsoleColor.Red;
         }
         Console.Write(ch);
+
+        if (!correct)
+        {
+            _errorsAt.Add(_typed.Count - 1);
+        }
+
         Console.ResetColor();
     }
 
     private void Unhighlight()
     {
         Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine);
+        Console.ResetColor();
         Console.Write(_lines[_currentLine][_currentPosition]);
     }
 
