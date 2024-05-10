@@ -1,0 +1,7 @@
+def hash_complex(z):
+    hash_value = hash_float(z.real) + sys.hash_info.imag * hash_float(z.imag)
+    M = 2**(sys.hash_info.width - 1)
+    hash_value = (hash_value & (M - 1)) - (hash_value & M)
+    if hash_value == -1:
+        hash_value = -2
+    return hash_value

@@ -17,6 +17,11 @@ internal class RaceFileHandler
         };
     }
 
+    private string GetRandomFileFromDirectory(string directory) =>
+        Directory.GetFiles(Path.Combine(assetsPath, directory))
+                 .OrderBy(x => random.Next())
+                 .First();
+
     private string[] GetTextFromQuotesFile()
     {
         // TODO: make this more dynamic.
@@ -26,17 +31,18 @@ internal class RaceFileHandler
 
     private string[] GetTextFromCsharpFile()
     {
-        throw new NotImplementedException();
+        // select random file from the directory `Csharp`
+        return File.ReadAllLines(GetRandomFileFromDirectory("./Csharp/"));
     }
 
     private string[] GetTextFromPythonFile()
     {
-        throw new NotImplementedException();
+        return File.ReadAllLines(GetRandomFileFromDirectory("./Python/"));
     }
 
     private string[] GetTextFromReactFile()
     {
-        throw new NotImplementedException();
+        return File.ReadAllLines(GetRandomFileFromDirectory("./React/"));
     }
 
     private string[] GetTextFromEnWordsFile()

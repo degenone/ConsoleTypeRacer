@@ -1,0 +1,15 @@
+public static void Main()
+{
+    Console.WriteLine(
+        "This example of the String Equality operator\n" +
+        "generates the following output.\n"
+    );
+    CompareAndDisplay("ijkl");
+    CompareAndDisplay("ABCD");
+    CompareAndDisplay("abcd");
+}
+static void CompareAndDisplay(string Comparand)
+{
+    String Lower = "abcd";
+    Console.WriteLine("\"{0}\" == \"{1}\" ?  {2}", Lower, Comparand, Lower == Comparand);
+}

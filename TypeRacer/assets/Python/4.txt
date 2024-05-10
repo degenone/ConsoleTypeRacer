@@ -1,0 +1,7 @@
+def hash_float(x):
+    if math.isnan(x):
+        return object.__hash__(x)
+    elif math.isinf(x):
+        return sys.hash_info.inf if x > 0 else -sys.hash_info.inf
+    else:
+        return hash_fraction(*x.as_integer_ratio())
