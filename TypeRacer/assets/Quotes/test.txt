@@ -1,4 +1,0 @@
-Hello, World!
-The lazy dog jumps over the quick brown fox.
-The quick brown fox jumps over the lazy dog.
-Hello, World! The lazy dog jumps over the quick brown fox. The quick brown fox jumps over the lazy dog. Hello, World! The lazy dog jumps over the quick brown fox. The quick brown fox jumps over the lazy dog."

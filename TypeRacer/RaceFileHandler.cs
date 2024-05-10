@@ -9,40 +9,20 @@ internal class RaceFileHandler
         return raceType switch
         {
             RaceType.EnWords => GetTextFromEnWordsFile(),
-            RaceType.Quotes => GetTextFromQuotesFile(),
-            RaceType.Csharp => GetTextFromCsharpFile(),
-            RaceType.Python => GetTextFromPythonFile(),
-            RaceType.React => GetTextFromReactFile(),
-            _ => throw new NotImplementedException()
+            RaceType.Quotes => GetTextFromRandomFileFromDirectory("./Quotes/"),
+            RaceType.Csharp => GetTextFromRandomFileFromDirectory("./Csharp/"),
+            RaceType.Python => GetTextFromRandomFileFromDirectory("./Python/"),
+            RaceType.React => GetTextFromRandomFileFromDirectory("./React/"),
+            _ => throw new NotImplementedException("GetTextFromRaceFile: Should be unreachable")
         };
     }
 
-    private string GetRandomFileFromDirectory(string directory) =>
-        Directory.GetFiles(Path.Combine(assetsPath, directory))
-                 .OrderBy(x => random.Next())
-                 .First();
-
-    private string[] GetTextFromQuotesFile()
+    private string[] GetTextFromRandomFileFromDirectory(string directory)
     {
-        // TODO: make this more dynamic.
-        string filePath = Path.Combine(assetsPath, "./Quotes/test.txt");
-        return File.ReadAllLines(filePath);
-    }
-
-    private string[] GetTextFromCsharpFile()
-    {
-        // select random file from the directory `Csharp`
-        return File.ReadAllLines(GetRandomFileFromDirectory("./Csharp/"));
-    }
-
-    private string[] GetTextFromPythonFile()
-    {
-        return File.ReadAllLines(GetRandomFileFromDirectory("./Python/"));
-    }
-
-    private string[] GetTextFromReactFile()
-    {
-        return File.ReadAllLines(GetRandomFileFromDirectory("./React/"));
+        var file = Directory.GetFiles(Path.Combine(assetsPath, directory))
+                            .OrderBy(x => random.Next())
+                            .First();
+        return File.ReadAllLines(file);
     }
 
     private string[] GetTextFromEnWordsFile()
