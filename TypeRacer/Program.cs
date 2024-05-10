@@ -1,5 +1,7 @@
 ﻿// Major TODOs:
-// - [ ] Add 5-10 files for each game mode (quotes / programming languages).
+// - [x] Add 5-10 files for each game mode (quotes / programming languages).
+//      - [ ] Quotes
+//      - [ ] Consider if it would be better to have them in actual c# files.
 // - [ ] Add scrolling to race text.
 // - [ ] Add a timer (I don't think I want to show it, just for the final score).
 // - [ ] Think about the layout of the screen. All centered? Left aligned?
