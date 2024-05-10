@@ -1,15 +1,14 @@
 ﻿namespace TypeRacer;
 internal static class Header
 {
-    private static readonly string[] _modes = ["Words", "Quotes", "C#", "Python", "React"];
+    // TODO: this is now tightly coupled with the RaceType enum. Think of a
+    // better way to do this.
+    private static readonly string[] _modes = ["Words", "Quotes", "C#",
+                                               "Python", "React"];
 
-    public static void Print(int index)
+    public static void Print(RaceType raceType)
     {
-        if (index < 0 || index >= _modes.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
+        int index = (int)raceType;
         Console.SetCursorPosition(0, 0);
         Console.WriteLine($"Modes:");
         for (int i = 0; i < _modes.Length; i++)

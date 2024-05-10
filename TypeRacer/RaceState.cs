@@ -40,17 +40,19 @@ internal class RaceState
 
     public void Print(bool resised = false)
     {
+        ClearRows();
+
         if (resised)
         {
             TextToWindowWidthLines();
         }
 
-        Console.SetCursorPosition(0, _rowOffset);
-        foreach (string line in _lines)
+        for (int i = 0; i < _lines.Count; i++)
         {
-            // Highlight typed words
+            Console.SetCursorPosition(0, _rowOffset + i);
+            Console.WriteLine(_lines[i]);
 
-            Console.WriteLine(line);
+            HighlightLine(i);
         }
     }
 
@@ -73,7 +75,7 @@ internal class RaceState
         }
 
         _typed.Add(ch);
-        Highlight();
+        HighlightCurrent();
 
         if (!(ch == _lines[_currentLine][_currentPosition]))
         {
@@ -131,11 +133,14 @@ internal class RaceState
         }
     }
 
-    private void Highlight()
+
+    private void HighlightCurrent() => HighlightChar(_currentLine, _currentPosition, _typed[^1]);
+
+    private void HighlightChar(int line, int pos, char typedCh)
     {
-        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine);
-        char ch = _lines[_currentLine][_currentPosition];
-        bool correct = ch == _typed[^1];
+        Console.SetCursorPosition(pos, _rowOffset + line);
+        char ch = _lines[line][pos];
+        bool correct = ch == typedCh;
         if (ch == ' ')
         {
             if (!correct) Console.BackgroundColor = ConsoleColor.Red;
@@ -146,6 +151,20 @@ internal class RaceState
         }
         Console.Write(ch);
         Console.ResetColor();
+    }
+
+    private void HighlightLine(int line)
+    {
+        if (_typed.Count == 0 || line > _currentLine) return;
+        // Highlight typed words
+
+        for (int pos = 0; pos < _lines[line].Length; pos++)
+        {
+            int idx = _lines.Take(line).Sum(l => l.Length) + pos;
+            if (idx >= _typed.Count) break;
+
+            HighlightChar(line, pos, _typed[idx]);
+        }
     }
 
     private void Unhighlight()
@@ -183,5 +202,46 @@ internal class RaceState
                 _lines.Add(line);
             }
         }
+    }
+
+    public void Reset()
+    {
+        // TODO: need to make sure all previous lines are empty.
+        ClearRows();
+        _typed.Clear();
+        _errorsAt.Clear();
+        _errorsMade = 0;
+        _currentPosition = 0;
+        _currentLine = 0;
+        // TODO: This should use RacerState
+        IsFinished = false;
+    }
+
+    private void ClearRows()
+    {
+        for (int i = 0; i < _lines.Count; i++)
+        {
+            Console.SetCursorPosition(0, _rowOffset + i);
+            Console.Write(new string(' ', Console.WindowWidth));
+        }
+    }
+
+    public void Results()
+    {
+        Console.Clear();
+        Console.WriteLine("Results:");
+        Console.WriteLine($"Errors: {_errorsMade}");
+        Console.WriteLine($"Words per minute: {Wpm()}");
+        Console.WriteLine($"Accuracy: {Accuracy()}%");
+    }
+
+    private object Wpm()
+    {
+        throw new NotImplementedException();
+    }
+
+    private object Accuracy()
+    {
+        throw new NotImplementedException();
     }
 }

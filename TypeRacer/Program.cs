@@ -1,4 +1,11 @@
-﻿using System.Text;
+﻿// Major TODOs:
+// - [ ] Add 5-10 files for each game mode (quotes / programming languages).
+// - [ ] Add scrolling to race text.
+// - [ ] Add a timer (I don't think I want to show it, just for the final score).
+// - [ ] Think about the layout of the screen. All centered? Left aligned?
+// - [ ] Results screen at the end of a race.
+// - [ ] Add a local DB to track scores.
+using System.Text;
 using TypeRacer;
 
 Console.Title = "TypeRacer";
@@ -7,10 +14,12 @@ Console.CursorVisible = false;
 
 Keyboard keyboard = new(3);
 
-string[] text = ["Hello, World!", "The lazy dog jumps over the quick brown fox.", "The quick brown fox jumps over the lazy dog.", "Hello, World! The lazy dog jumps over the quick brown fox. The quick brown fox jumps over the lazy dog. Hello, World! The lazy dog jumps over the quick brown fox. The quick brown fox jumps over the lazy dog."];
+RaceType raceType = RaceType.Quotes;
+RaceFileHandler raceFileHandler = new();
+string[] text = raceFileHandler.GetTextFromRaceFile(raceType);
 RaceState race = new(text, 10);
 
-PrintScreen(keyboard, race);
+PrintScreen(keyboard, race, raceType);
 
 int width = Console.WindowWidth;
 int height = Console.WindowHeight;
@@ -28,7 +37,7 @@ while (true)
         {
             height = Console.WindowHeight;
             width = Console.WindowWidth;
-            PrintScreen(keyboard, race);
+            PrintScreen(keyboard, race, raceType);
         }
 
         if (pressed.Key == ConsoleKey.Backspace)
@@ -40,6 +49,14 @@ while (true)
         {
             race.RemoveWord();
         }
+        else if (pressed.Key == ConsoleKey.D1 && pressed.Modifiers == ConsoleModifiers.Control)
+        {
+            raceType = RaceType.EnWords;
+            race.Reset();
+            race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
+            race.Print();
+            Header.Print(raceType);
+        }
         else
         {
             race.AddChar(pressed.KeyChar);
@@ -49,12 +66,12 @@ while (true)
 
 Console.Clear();
 
-static void PrintScreen(Keyboard keyboard, RaceState race, int modeIndex = 0)
+static void PrintScreen(Keyboard keyboard, RaceState race, RaceType raceType)
 {
     Console.Clear();
 
     // Header
-    Header.Print(modeIndex);
+    Header.Print(raceType);
 
     // Keyboard
     keyboard.Print();
