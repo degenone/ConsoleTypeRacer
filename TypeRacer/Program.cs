@@ -16,7 +16,7 @@ Console.CursorVisible = false;
 
 Keyboard keyboard = new(3);
 
-RaceType raceType = RaceType.Quotes;
+RaceType raceType = RaceType.EnWords;
 RaceFileHandler raceFileHandler = new();
 string[] text = raceFileHandler.GetTextFromRaceFile(raceType);
 RaceState race = new(text, 10);
@@ -32,6 +32,16 @@ while (true)
     if (pressed.Key == ConsoleKey.Q && pressed.Modifiers == ConsoleModifiers.Control || race.IsFinished)
     {
         break;
+    }
+    else if (
+        pressed.Modifiers == ConsoleModifiers.Control &&
+        RaceModes.Modes.TryGetValue(pressed.Key, out RaceMode? mode)
+        )
+    {
+        raceType = mode.Type;
+        race.Reset();
+        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
+        PrintScreen(keyboard, race, raceType);
     }
     else if (keyboard.RegisterPress(pressed.Key, pressed.Modifiers == ConsoleModifiers.Shift))
     {
@@ -50,17 +60,6 @@ while (true)
         else if (pressed.Key == ConsoleKey.W && pressed.Modifiers == ConsoleModifiers.Control)
         {
             race.RemoveWord();
-        }
-        else if (
-            pressed.Modifiers == ConsoleModifiers.Control &&
-            RaceModes.Modes.TryGetValue(pressed.Key, out RaceMode? mode)
-            )
-        {
-            raceType = mode.Type;
-            race.Reset();
-            race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
-            race.Print();
-            Header.Print(raceType);
         }
         else
         {
@@ -87,6 +86,6 @@ static void PrintScreen(Keyboard keyboard, RaceState race, RaceType raceType)
     // Footer
     // TODO: This should be dynamic positioning below the race text, one line gap
     // TODO: Ctrl + Q and Ctrl + W are maybe too close together for accidental quits.
-    Console.SetCursorPosition(0, Console.WindowHeight - 2);
-    Console.Write("Press 'Ctrl + Q' to quit");
+    Console.SetCursorPosition(0, Console.WindowHeight - 1);
+    Console.Write($"Press 'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
 }
