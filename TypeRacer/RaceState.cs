@@ -1,4 +1,6 @@
-﻿namespace TypeRacer;
+﻿using System.Diagnostics;
+
+namespace TypeRacer;
 internal class RaceState
 {
     /// <summary>
@@ -35,8 +37,9 @@ internal class RaceState
     private int _totalChars = 0;
     private int _currentPosition = 0;
     private int _currentLine = 0;
+    private readonly Stopwatch _raceTimer = new();
 
-    public bool IsFinished { get; private set; } = false;
+    public RacerState State { get; private set; } = RacerState.NotStarted;
     public int LinesShownCount { get; set; } = 5;
 
     public void Print(bool resised = false)
@@ -81,7 +84,12 @@ internal class RaceState
 
     public void AddChar(char ch)
     {
-        if (IsFinished) return;
+        if (State == RacerState.Finished) return;
+        else if (State == RacerState.NotStarted)
+        {
+            State = RacerState.InProgress;
+            _raceTimer.Start();
+        }
 
         // TODO: If Tab is used incorrectly it can count upto 4 errors when it should be 1.
         if (ch == '\t')
@@ -110,7 +118,11 @@ internal class RaceState
             PrintRaceLines();
         }
 
-        if (_totalChars <= _typed.Count) IsFinished = true;
+        if (_totalChars <= _typed.Count)
+        {
+            State = RacerState.Finished;
+            _raceTimer.Stop();
+        }
     }
 
     public void RemoveChar()
@@ -235,7 +247,7 @@ internal class RaceState
         _currentLine = 0;
         _totalChars = 0;
         // TODO: This should use RacerState
-        IsFinished = false;
+        State = RacerState.NotStarted;
     }
 
     private void ClearRows()
@@ -256,14 +268,18 @@ internal class RaceState
         Console.WriteLine($"Accuracy: {Accuracy()}%");
     }
 
-    private object Wpm()
+    private int Wpm()
     {
-        throw new NotImplementedException();
+        // TODO: This is not the greatest measure of WPM, but it's a start.
+        //       With code it's a bit more difficult to measure.
+        TimeSpan elapced = _raceTimer.Elapsed;
+        return (int)(_text.Select(l => l.Split(' ').Length).Sum() / elapced.TotalMinutes);
     }
 
-    private object Accuracy()
+    private double Accuracy()
     {
-        throw new NotImplementedException();
+        // TODO: is this the correct measure for accuracy?
+        return (1 - (double)_errorsMade / _typed.Count) * 100;
     }
 }
 

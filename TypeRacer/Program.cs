@@ -3,12 +3,13 @@
 //      - [x] Quotes
 //      - [ ] Consider if it would be better to have them in actual c# files.
 // - [x] Add scrolling to race text.
-// - [ ] Add a timer (I don't think I want to show it, just for the final
+// - [x] Add a timer (I don't think I want to show it, just for the final
 // score).
 // - [x] Think about the layout of the screen. All centered? Left aligned?
 //       For now it will be easier to left align. For future, there is
 //       `Centered` property in Keyboard.
-// - [ ] Results screen at the end of a race.
+// - [x] Results screen at the end of a race.
+// - [ ] Finishing the race should not end the program, only Ctrl + Q should.
 // - [ ] Add a local DB to track scores.
 using System.Text;
 using TypeRacer;
@@ -32,8 +33,14 @@ while (true)
 {
     ConsoleKeyInfo pressed = Console.ReadKey(true);
 
-    if (pressed.Key == ConsoleKey.Q && pressed.Modifiers == ConsoleModifiers.Control || race.IsFinished)
+    if (
+        pressed.Key == ConsoleKey.Q &&
+        pressed.Modifiers == ConsoleModifiers.Control ||
+        race.State == RacerState.Finished
+        )
     {
+        Console.Clear();
+        race.Results();
         break;
     }
     else if (
@@ -70,8 +77,6 @@ while (true)
         }
     }
 }
-
-Console.Clear();
 
 static void PrintScreen(Keyboard keyboard, RaceState race, RaceType raceType)
 {
