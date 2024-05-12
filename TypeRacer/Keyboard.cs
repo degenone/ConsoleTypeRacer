@@ -69,17 +69,19 @@ internal class Keyboard(int Offset)
     private readonly (Key key, bool shift)[] _history = new (Key, bool)[5];
     private readonly ConsoleColor[] _historyColors = [ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.DarkYellow, ConsoleColor.Magenta, ConsoleColor.DarkBlue];
 
+    public bool Centered { get; set; } = false;
+
     public void Print()
     {
-        int center = Console.WindowWidth / 2;
+        int lineOffset = Centered ? (Console.WindowWidth - Width) / 2 : 0;
         foreach (var key in Keys.Values)
         {
-            int col = center - Width / 2 + key.Column;
+            int col = lineOffset + key.Column;
             Console.SetCursorPosition(col, key.Row + Offset);
             Console.Write(key.Chars);
         }
         (int _, int top) = Console.GetCursorPosition();
-        Console.SetCursorPosition(center - Width / 2, top + 2);
+        Console.SetCursorPosition(lineOffset, top + 2);
         Console.Write("History: most recent ");
         for (int i = 0; i < _historyColors.Length; i++)
         {

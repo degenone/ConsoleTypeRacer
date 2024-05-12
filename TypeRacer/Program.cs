@@ -3,8 +3,11 @@
 //      - [x] Quotes
 //      - [ ] Consider if it would be better to have them in actual c# files.
 // - [ ] Add scrolling to race text.
-// - [ ] Add a timer (I don't think I want to show it, just for the final score).
-// - [ ] Think about the layout of the screen. All centered? Left aligned?
+// - [ ] Add a timer (I don't think I want to show it, just for the final
+// score).
+// - [x] Think about the layout of the screen. All centered? Left aligned?
+//       For now it will be easier to left align. For future, there is
+//       `Centered` property in Keyboard.
 // - [ ] Results screen at the end of a race.
 // - [ ] Add a local DB to track scores.
 using System.Text;
