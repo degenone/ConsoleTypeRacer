@@ -68,20 +68,20 @@ internal class Keyboard(int Offset)
     private const int Width = 62;
     private readonly (Key key, bool shift)[] _history = new (Key, bool)[5];
     private readonly ConsoleColor[] _historyColors = [ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.DarkYellow, ConsoleColor.Magenta, ConsoleColor.DarkBlue];
+    private int LineOffset => Centered ? (Console.WindowWidth - Width) / 2 : 0;
 
     public bool Centered { get; set; } = false;
 
     public void Print()
     {
-        int lineOffset = Centered ? (Console.WindowWidth - Width) / 2 : 0;
         foreach (var key in Keys.Values)
         {
-            int col = lineOffset + key.Column;
+            int col = LineOffset + key.Column;
             Console.SetCursorPosition(col, key.Row + Offset);
             Console.Write(key.Chars);
         }
         (int _, int top) = Console.GetCursorPosition();
-        Console.SetCursorPosition(lineOffset, top + 2);
+        Console.SetCursorPosition(LineOffset, top + 2);
         Console.Write("History: most recent ");
         for (int i = 0; i < _historyColors.Length; i++)
         {
@@ -119,8 +119,7 @@ internal class Keyboard(int Offset)
 
     private void Highlight(Key key, bool shift, int colorIndex)
     {
-        int center = Console.WindowWidth / 2;
-        int col = center - Width / 2 + key.Column;
+        int col = LineOffset + key.Column;
         if (shift && key.Chars.Length == 2) col++;
         Console.SetCursorPosition(col, key.Row + Offset);
         Console.BackgroundColor = _historyColors[colorIndex];
@@ -131,8 +130,7 @@ internal class Keyboard(int Offset)
 
     private void Unhighlight(Key key, bool shift)
     {
-        int center = Console.WindowWidth / 2;
-        int col = center - Width / 2 + key.Column;
+        int col = LineOffset + key.Column;
         if (shift && key.Chars.Length == 2) col++;
         Console.SetCursorPosition(col, key.Row + Offset);
         Console.ResetColor();

@@ -37,6 +37,7 @@ internal class RaceState
     private int _currentLine = 0;
 
     public bool IsFinished { get; private set; } = false;
+    public int LinesShownCount { get; set; } = 5;
 
     public void Print(bool resised = false)
     {
@@ -47,12 +48,28 @@ internal class RaceState
             TextToWindowWidthLines();
         }
 
-        for (int i = 0; i < _lines.Count; i++)
+        PrintRaceLines();
+    }
+
+    private void PrintRaceLines()
+    {
+        if (_currentLine % LinesShownCount != 0) return;
+
+        ClearRows();
+        int start = _currentLine / LinesShownCount * LinesShownCount;
+        int end = Math.Min(_lines.Count - start, LinesShownCount);
+        for (int i = 0; i < end; i++)
         {
             Console.SetCursorPosition(0, _rowOffset + i);
-            Console.WriteLine(_lines[i]);
+            Console.WriteLine(_lines[start + i]);
 
-            HighlightLine(i);
+            HighlightLine(start + i);
+        }
+
+        if (LinesShownCount < _lines.Count - start)
+        {
+            Console.SetCursorPosition(0, _rowOffset + end);
+            Console.WriteLine("...");
         }
     }
 
@@ -64,6 +81,8 @@ internal class RaceState
 
     public void AddChar(char ch)
     {
+        if (IsFinished) return;
+
         // TODO: If Tab is used incorrectly it can count upto 4 errors when it should be 1.
         if (ch == '\t')
         {
@@ -88,9 +107,10 @@ internal class RaceState
         {
             _currentPosition = 0;
             _currentLine++;
+            PrintRaceLines();
         }
 
-        if (_totalChars == _typed.Count) IsFinished = true;
+        if (_totalChars <= _typed.Count) IsFinished = true;
     }
 
     public void RemoveChar()
@@ -133,12 +153,11 @@ internal class RaceState
         }
     }
 
-
     private void HighlightCurrent() => HighlightChar(_currentLine, _currentPosition, _typed[^1]);
 
     private void HighlightChar(int line, int pos, char typedCh)
     {
-        Console.SetCursorPosition(pos, _rowOffset + line);
+        Console.SetCursorPosition(pos, _rowOffset + line % LinesShownCount);
         char ch = _lines[line][pos];
         bool correct = ch == typedCh;
         if (ch == ' ')
@@ -156,7 +175,6 @@ internal class RaceState
     private void HighlightLine(int line)
     {
         if (_typed.Count == 0 || line > _currentLine) return;
-        // Highlight typed words
 
         for (int pos = 0; pos < _lines[line].Length; pos++)
         {
@@ -169,7 +187,7 @@ internal class RaceState
 
     private void Unhighlight()
     {
-        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine);
+        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine % LinesShownCount);
         Console.ResetColor();
         Console.Write(_lines[_currentLine][_currentPosition]);
     }
@@ -197,6 +215,8 @@ internal class RaceState
 
             if (!string.IsNullOrWhiteSpace(line))
             {
+                // TODO: I want to make this a new line, at least for all code
+                // races, but maybe for all types.
                 if (i < _text.Length - 1) line += " ";
                 _totalChars += line.Length;
                 _lines.Add(line);
@@ -213,13 +233,14 @@ internal class RaceState
         _errorsMade = 0;
         _currentPosition = 0;
         _currentLine = 0;
+        _totalChars = 0;
         // TODO: This should use RacerState
         IsFinished = false;
     }
 
     private void ClearRows()
     {
-        for (int i = 0; i < _lines.Count; i++)
+        for (int i = 0; i <= _lines.Count; i++)
         {
             Console.SetCursorPosition(0, _rowOffset + i);
             Console.Write(new string(' ', Console.WindowWidth));

@@ -2,7 +2,7 @@
 // - [x] Add 5-10 files for each game mode (quotes / programming languages).
 //      - [x] Quotes
 //      - [ ] Consider if it would be better to have them in actual c# files.
-// - [ ] Add scrolling to race text.
+// - [x] Add scrolling to race text.
 // - [ ] Add a timer (I don't think I want to show it, just for the final
 // score).
 // - [x] Think about the layout of the screen. All centered? Left aligned?
