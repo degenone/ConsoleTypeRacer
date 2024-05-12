@@ -51,9 +51,12 @@ while (true)
         {
             race.RemoveWord();
         }
-        else if (pressed.Key == ConsoleKey.D1 && pressed.Modifiers == ConsoleModifiers.Control)
+        else if (
+            pressed.Modifiers == ConsoleModifiers.Control &&
+            RaceModes.Modes.TryGetValue(pressed.Key, out RaceMode? mode)
+            )
         {
-            raceType = RaceType.EnWords;
+            raceType = mode.Type;
             race.Reset();
             race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
             race.Print();

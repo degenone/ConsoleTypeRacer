@@ -245,3 +245,10 @@ internal class RaceState
         throw new NotImplementedException();
     }
 }
+
+internal enum RacerState
+{
+    NotStarted,
+    InProgress,
+    Finished
+}
