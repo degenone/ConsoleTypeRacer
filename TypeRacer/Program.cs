@@ -8,15 +8,21 @@
 // - [x] Think about the layout of the screen. All centered? Left aligned?
 //       For now it will be easier to left align. For future, there is
 //       `Centered` property in Keyboard.
+//      - [ ] Should there be a max width for the text? 80?
+//      - [ ] There should be an `error` screen if console is too small.
 // - [x] Results screen at the end of a race.
-// - [ ] Finishing the race should not end the program, only Ctrl + Q should.
+// - [x] Finishing the race should not end the program, only Ctrl + Q should.
 // - [ ] Add a local DB to track scores.
+// - [ ] Add `Modes`, time trial, word count, accuracy, etc.
+//       I'm not sure if what to call these though.
+// - [ ] Refactor the code to be more readable and see if I can seperate
+//       `RaceState` (or others) into smaller parts.
+// - [ ] Figure out what the final product looks like.
 using System.Text;
 using TypeRacer;
 
 Console.Title = "TypeRacer";
 Console.OutputEncoding = Encoding.UTF8;
-Console.CursorVisible = false;
 
 Keyboard keyboard = new(3);
 
@@ -25,7 +31,7 @@ RaceFileHandler raceFileHandler = new();
 string[] text = raceFileHandler.GetTextFromRaceFile(raceType);
 RaceState race = new(text, 10);
 
-PrintScreen(keyboard, race, raceType);
+Screen.Print(keyboard, race, raceType);
 
 int width = Console.WindowWidth;
 int height = Console.WindowHeight;
@@ -33,15 +39,19 @@ while (true)
 {
     ConsoleKeyInfo pressed = Console.ReadKey(true);
 
-    if (
-        pressed.Key == ConsoleKey.Q &&
-        pressed.Modifiers == ConsoleModifiers.Control ||
-        race.State == RacerState.Finished
-        )
+    if (pressed.Key == ConsoleKey.Q && pressed.Modifiers == ConsoleModifiers.Control)
     {
         Console.Clear();
-        race.Results();
         break;
+    }
+    else if (pressed.Key == ConsoleKey.R && pressed.Modifiers == ConsoleModifiers.Control)
+    {
+        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
+        Screen.Print(keyboard, race, raceType);
+    }
+    else if (pressed.Key == ConsoleKey.L && pressed.Modifiers == ConsoleModifiers.Control)
+    { 
+        Screen.Print(keyboard, race, raceType);
     }
     else if (
         pressed.Modifiers == ConsoleModifiers.Control &&
@@ -49,9 +59,8 @@ while (true)
         )
     {
         raceType = mode.Type;
-        race.Reset();
         race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
-        PrintScreen(keyboard, race, raceType);
+        Screen.Print(keyboard, race, raceType);
     }
     else if (keyboard.RegisterPress(pressed.Key, pressed.Modifiers == ConsoleModifiers.Shift))
     {
@@ -59,7 +68,7 @@ while (true)
         {
             height = Console.WindowHeight;
             width = Console.WindowWidth;
-            PrintScreen(keyboard, race, raceType);
+            Screen.Print(keyboard, race, raceType);
         }
 
         if (pressed.Key == ConsoleKey.Backspace)
@@ -73,27 +82,14 @@ while (true)
         }
         else
         {
+            Screen.ShowCursor();
             race.AddChar(pressed.KeyChar);
+
+            if (race.State == RacerState.Finished)
+            {
+                race.Results();
+                Screen.HideCursor();
+            }
         }
     }
-}
-
-static void PrintScreen(Keyboard keyboard, RaceState race, RaceType raceType)
-{
-    Console.Clear();
-
-    // Header
-    Header.Print(raceType);
-
-    // Keyboard
-    keyboard.Print();
-
-    // Text to race
-    race.Print();
-
-    // Footer
-    // TODO: This should be dynamic positioning below the race text, one line gap
-    // TODO: Ctrl + Q and Ctrl + W are maybe too close together for accidental quits.
-    Console.SetCursorPosition(0, Console.WindowHeight - 1);
-    Console.Write($"Press 'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
 }

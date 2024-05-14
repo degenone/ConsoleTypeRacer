@@ -51,7 +51,8 @@ internal class RaceState
             TextToWindowWidthLines();
         }
 
-        PrintRaceLines();
+        if (State == RacerState.Finished) Results();
+        else PrintRaceLines();
     }
 
     private void PrintRaceLines()
@@ -78,6 +79,7 @@ internal class RaceState
 
     public void UpdateText(string[] text)
     {
+        Reset();
         _text = text;
         TextToWindowWidthLines();
     }
@@ -169,6 +171,10 @@ internal class RaceState
 
     private void HighlightChar(int line, int pos, char typedCh)
     {
+        // BUG: `pos` or `left` parameter can sometimes be out of range. Not
+        //      sure what could cause it? Maybe the line is exaclty the width of the
+        //      console window and I add a space, therefor making it out of range?
+        //      Making the text have a max width (less than console) would fix this.
         Console.SetCursorPosition(pos, _rowOffset + line % LinesShownCount);
         char ch = _lines[line][pos];
         bool correct = ch == typedCh;
@@ -202,6 +208,7 @@ internal class RaceState
         Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine % LinesShownCount);
         Console.ResetColor();
         Console.Write(_lines[_currentLine][_currentPosition]);
+        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine % LinesShownCount);
     }
 
     private void TextToWindowWidthLines()
@@ -229,6 +236,8 @@ internal class RaceState
             {
                 // TODO: I want to make this a new line, at least for all code
                 // races, but maybe for all types.
+                // BUG(maybe): Make sure there is never an empty line at the
+                //             end of a race text. Could be source text too.
                 if (i < _text.Length - 1) line += " ";
                 _totalChars += line.Length;
                 _lines.Add(line);
@@ -236,9 +245,8 @@ internal class RaceState
         }
     }
 
-    public void Reset()
+    private void Reset()
     {
-        // TODO: need to make sure all previous lines are empty.
         ClearRows();
         _typed.Clear();
         _errorsAt.Clear();
@@ -246,13 +254,13 @@ internal class RaceState
         _currentPosition = 0;
         _currentLine = 0;
         _totalChars = 0;
-        // TODO: This should use RacerState
+        _raceTimer.Reset();
         State = RacerState.NotStarted;
     }
 
     private void ClearRows()
     {
-        for (int i = 0; i <= _lines.Count; i++)
+        for (int i = 0; i <= LinesShownCount; i++)
         {
             Console.SetCursorPosition(0, _rowOffset + i);
             Console.Write(new string(' ', Console.WindowWidth));
@@ -261,7 +269,8 @@ internal class RaceState
 
     public void Results()
     {
-        Console.Clear();
+        ClearRows();
+        Console.SetCursorPosition(0, _rowOffset);
         Console.WriteLine("Results:");
         Console.WriteLine($"Errors: {_errorsMade}");
         Console.WriteLine($"Words per minute: {Wpm()}");

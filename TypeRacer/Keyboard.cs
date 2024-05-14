@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 
 namespace TypeRacer;
-internal class Keyboard(int Offset)
+internal class Keyboard(int rowOffset)
 {
     public static readonly ImmutableDictionary<ConsoleKey, Key> Keys = ImmutableDictionary.CreateRange(
         new KeyValuePair<ConsoleKey, Key>[] {
@@ -77,7 +77,7 @@ internal class Keyboard(int Offset)
         foreach (var key in Keys.Values)
         {
             int col = LineOffset + key.Column;
-            Console.SetCursorPosition(col, key.Row + Offset);
+            Console.SetCursorPosition(col, key.Row + rowOffset);
             Console.Write(key.Chars);
         }
         (int _, int top) = Console.GetCursorPosition();
@@ -121,7 +121,7 @@ internal class Keyboard(int Offset)
     {
         int col = LineOffset + key.Column;
         if (shift && key.Chars.Length == 2) col++;
-        Console.SetCursorPosition(col, key.Row + Offset);
+        Console.SetCursorPosition(col, key.Row + rowOffset);
         Console.BackgroundColor = _historyColors[colorIndex];
         Console.ForegroundColor = ConsoleColor.Black;
         Console.Write(KeyToString(key, shift));
@@ -132,7 +132,7 @@ internal class Keyboard(int Offset)
     {
         int col = LineOffset + key.Column;
         if (shift && key.Chars.Length == 2) col++;
-        Console.SetCursorPosition(col, key.Row + Offset);
+        Console.SetCursorPosition(col, key.Row + rowOffset);
         Console.ResetColor();
         Console.Write(KeyToString(key, shift));
     }
