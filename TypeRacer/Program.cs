@@ -51,6 +51,8 @@ while (true)
     }
     else if (pressed.Key == ConsoleKey.L && pressed.Modifiers == ConsoleModifiers.Control)
     { 
+        width = Console.WindowWidth;
+        height = Console.WindowHeight;
         Screen.Print(keyboard, race, raceType);
     }
     else if (
