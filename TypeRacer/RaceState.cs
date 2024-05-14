@@ -37,10 +37,11 @@ internal class RaceState
     private int _totalChars = 0;
     private int _currentPosition = 0;
     private int _currentLine = 0;
+    private const int _lineLength = 90;
     private readonly Stopwatch _raceTimer = new();
 
     public RacerState State { get; private set; } = RacerState.NotStarted;
-    public int LinesShownCount { get; set; } = 5;
+    public int LinesShownCount { get; set; } = 8;
 
     public void Print(bool resised = false)
     {
@@ -215,13 +216,15 @@ internal class RaceState
     {
         _lines.Clear();
 
+        int maxLineLength = Math.Min(_LineLength, Console.WindowWidth - 1);
+
         for (int i = 0; i < _text.Length; i++)
         {
             string line = _text[i];
 
-            while (line.Length > Console.WindowWidth)
+            while (line.Length > maxLineLength)
             {
-                int lastSpace = line.LastIndexOf(' ', Console.WindowWidth);
+                int lastSpace = line.LastIndexOf(' ', maxLineLength);
                 if (lastSpace == -1)
                 {
                     throw new InvalidOperationException("Line contains no spaces and is too long to fit window.");
@@ -236,8 +239,6 @@ internal class RaceState
             {
                 // TODO: I want to make this a new line, at least for all code
                 // races, but maybe for all types.
-                // BUG(maybe): Make sure there is never an empty line at the
-                //             end of a race text. Could be source text too.
                 if (i < _text.Length - 1) line += " ";
                 _totalChars += line.Length;
                 _lines.Add(line);
