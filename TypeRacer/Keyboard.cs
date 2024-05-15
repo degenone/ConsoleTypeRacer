@@ -65,7 +65,8 @@ internal class Keyboard(int rowOffset)
             KeyValuePair.Create<ConsoleKey, Key>(ConsoleKey.Spacebar, new(['S', 'p', 'a', 'c', 'e'], 21, 4)),
         });
 
-    private const int Width = 62;
+    public const int Width = 62;
+    public const int Height = 7; // 5 rows + 1 for history + 1 for spacing
     private readonly (Key key, bool shift)[] _history = new (Key, bool)[5];
     private readonly ConsoleColor[] _historyColors = [ConsoleColor.White, ConsoleColor.Yellow, ConsoleColor.DarkYellow, ConsoleColor.Magenta, ConsoleColor.DarkBlue];
     private int LineOffset => Centered ? (Console.WindowWidth - Width) / 2 : 0;

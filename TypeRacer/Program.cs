@@ -8,8 +8,8 @@
 // - [x] Think about the layout of the screen. All centered? Left aligned?
 //       For now it will be easier to left align. For future, there is
 //       `Centered` property in Keyboard.
-//      - [ ] Should there be a max width for the text? 80?
-//      - [ ] There should be an `error` screen if console is too small.
+//      - [x] Should there be a max width for the text? 80?
+//      - [x] There should be an `error` screen if console is too small.
 // - [x] Results screen at the end of a race.
 // - [x] Finishing the race should not end the program, only Ctrl + Q should.
 // - [ ] Add a local DB to track scores.

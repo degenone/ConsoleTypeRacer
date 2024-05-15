@@ -41,7 +41,8 @@ internal class RaceState
     private readonly Stopwatch _raceTimer = new();
 
     public RacerState State { get; private set; } = RacerState.NotStarted;
-    public int LinesShownCount { get; set; } = 8;
+    public const int LinesShownCount = 8;
+    public const int Height = LinesShownCount + 1; // 1 for the "..." line / spacing
 
     public void Print(bool resised = false)
     {
@@ -216,7 +217,7 @@ internal class RaceState
     {
         _lines.Clear();
 
-        int maxLineLength = Math.Min(_LineLength, Console.WindowWidth - 1);
+        int maxLineLength = Math.Min(_lineLength, Console.WindowWidth - 1);
 
         for (int i = 0; i < _text.Length; i++)
         {

@@ -1,6 +1,7 @@
 ﻿namespace TypeRacer;
 internal static class Header
 {
+    public const int Height = 3; // 2 rows for modes + 1 spacing
     public static void Print(RaceType raceType)
     {
         Console.SetCursorPosition(0, 0);

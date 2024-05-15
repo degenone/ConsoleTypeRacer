@@ -1,9 +1,17 @@
 ﻿namespace TypeRacer;
 internal static class Screen
 {
+    public const int MinHeight = Header.Height + Keyboard.Height + RaceState.Height + 2; // 2 for footer
+    public const int MinWidth = Keyboard.Width;
     public static void Print(Keyboard keyboard, RaceState race, RaceType raceType)
     {
         Console.Clear();
+
+        if (Console.WindowHeight < MinHeight || Console.WindowWidth < MinWidth)
+        {
+            Error();
+            return;
+        }
 
         // Header
         Header.Print(raceType);
@@ -19,6 +27,8 @@ internal static class Screen
         // TODO: Ctrl + Q and Ctrl + W are maybe too close together for accidental quits.
         Console.SetCursorPosition(0, Console.WindowHeight - 1);
         Console.Write($"Press 'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
+
+        Console.SetCursorPosition(0, Header.Height + Keyboard.Height);
     }
 
     public static void ShowCursor()
@@ -39,5 +49,11 @@ internal static class Screen
     public static void HideCursor()
     {
         Console.CursorVisible = false;
+    }
+
+    private static void Error()
+    {
+        Console.WriteLine($"Terminal must be at least {MinHeight} rows, {MinWidth} cols.");
+        Console.WriteLine("Press `Ctrl + L` to refresh.");
     }
 }
