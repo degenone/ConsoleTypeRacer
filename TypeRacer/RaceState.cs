@@ -153,6 +153,7 @@ internal class RaceState
     public void RemoveWord()
     {
         if (_typed.Count == 0) return;
+
         if (_typed[^1] == ' ')
         {
             while (_typed.Count > 0 && _errorsAt.Count > 0 && _typed[^1] == ' ')
@@ -167,27 +168,28 @@ internal class RaceState
                 RemoveChar();
             }
         }
+
+        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine % LinesShownCount);
     }
 
     private void HighlightCurrent() => HighlightChar(_currentLine, _currentPosition, _typed[^1]);
 
     private void HighlightChar(int line, int pos, char typedCh)
     {
-        // BUG: `pos` or `left` parameter can sometimes be out of range. Not
-        //      sure what could cause it? Maybe the line is exaclty the width of the
-        //      console window and I add a space, therefor making it out of range?
-        //      Making the text have a max width (less than console) would fix this.
         Console.SetCursorPosition(pos, _rowOffset + line % LinesShownCount);
+
         char ch = _lines[line][pos];
         bool correct = ch == typedCh;
-        if (ch == ' ')
-        {
-            if (!correct) Console.BackgroundColor = ConsoleColor.Red;
-        }
-        else
+
+        if (ch != ' ')
         {
             Console.ForegroundColor = correct ? ConsoleColor.Green : ConsoleColor.Red;
         }
+        else if (ch == ' ' && !correct)
+        {
+            Console.BackgroundColor = ConsoleColor.Red;
+        }
+
         Console.Write(ch);
         Console.ResetColor();
     }
@@ -276,7 +278,7 @@ internal class RaceState
         Console.WriteLine("Results:");
         Console.WriteLine($"Errors: {_errorsMade}");
         Console.WriteLine($"Words per minute: {Wpm()}");
-        Console.WriteLine($"Accuracy: {Accuracy()}%");
+        Console.WriteLine($"Accuracy: {Accuracy():0.00}%");
     }
 
     private int Wpm()
