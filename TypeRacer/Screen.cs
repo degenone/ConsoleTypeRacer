@@ -59,6 +59,14 @@ internal static class Screen
     
     public static bool ConfirmModal(string message)
     {
+        // TODO: The message should only be allowed to be a certain length.
+        //       If it's longer, it should be split into multiple lines.
+        //       Max width should be Console.WindowWidth - 10 or something.
+        // TODO: Make border dynamic that can be used for other modals.
+        if (message.Length > Console.WindowWidth - 10)
+        {
+            throw new ArgumentException("Message is too long.");
+        }
         HideCursor();
         int modalWidth = message.Length + 2 + 2; // 2 for padding, 2 for border
         int modalHeight = 7; // 3 for padding, 2 for border, 1 for message, 1 for Y/N
