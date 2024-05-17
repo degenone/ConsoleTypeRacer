@@ -18,6 +18,7 @@
 // - [ ] Refactor the code to be more readable and see if I can seperate
 //       `RaceState` (or others) into smaller parts.
 // - [ ] Figure out what the final product looks like.
+// - [x] Add 'Are you sure' confirm window, e.g. to quit.
 using System.Text;
 using TypeRacer;
 
@@ -41,8 +42,16 @@ while (true)
 
     if (pressed.Key == ConsoleKey.Q && pressed.Modifiers == ConsoleModifiers.Control)
     {
-        Console.Clear();
-        break;
+        if (Screen.ConfirmModal("Are you sure you want to quit?"))
+        {
+            Console.Clear();
+            break;
+        }
+        else
+        {
+            Screen.ShowCursor();
+            Screen.Print(keyboard, race, raceType);
+        }
     }
     else if (pressed.Key == ConsoleKey.R && pressed.Modifiers == ConsoleModifiers.Control)
     {
@@ -50,7 +59,7 @@ while (true)
         Screen.Print(keyboard, race, raceType);
     }
     else if (pressed.Key == ConsoleKey.L && pressed.Modifiers == ConsoleModifiers.Control)
-    { 
+    {
         width = Console.WindowWidth;
         height = Console.WindowHeight;
         Screen.Print(keyboard, race, raceType);
@@ -87,7 +96,7 @@ while (true)
             Screen.ShowCursor();
             race.AddChar(pressed.KeyChar);
 
-            if (race.State == RacerState.Finished)
+            if (race.Status == RaceStatus.Finished)
             {
                 race.Results();
                 Screen.HideCursor();

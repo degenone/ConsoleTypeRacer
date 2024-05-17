@@ -56,4 +56,40 @@ internal static class Screen
         Console.WriteLine($"Terminal must be at least {MinHeight} rows, {MinWidth} cols.");
         Console.WriteLine("Press `Ctrl + L` to refresh.");
     }
+    
+    public static bool ConfirmModal(string message)
+    {
+        HideCursor();
+        int modalWidth = message.Length + 2 + 2; // 2 for padding, 2 for border
+        int modalHeight = 7; // 3 for padding, 2 for border, 1 for message, 1 for Y/N
+        int left = (Console.WindowWidth - modalWidth) / 2;
+        int top = (Console.WindowHeight - modalHeight) / 2;
+        Console.SetCursorPosition(left, top);
+        Console.Write("╔" + new string('═', message.Length + 2) + "╗");
+        Console.SetCursorPosition(left, top + 1);
+        Console.Write("║ " + new string(' ', message.Length) + " ║");
+        Console.SetCursorPosition(left, top + 2);
+        Console.Write("║ " + message + " ║");
+        Console.SetCursorPosition(left, top + 3);
+        Console.Write("║ " + new string(' ', message.Length) + " ║");
+        Console.SetCursorPosition(left, top + 4);
+        Console.Write("║ " + "[Y]es / [N]o".PadLeft(message.Length) + " ║");
+        Console.SetCursorPosition(left, top + 5);
+        Console.Write("║ " + new string(' ', message.Length) + " ║");
+        Console.SetCursorPosition(left, top + 6);
+        Console.Write("╚" + new string('═', message.Length + 2) + "╝");
+
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.Y)
+            {
+                return true;
+            }
+            else if (key.Key == ConsoleKey.N)
+            {
+                return false;
+            }
+        }
+    }
 }

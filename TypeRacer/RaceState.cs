@@ -40,7 +40,7 @@ internal class RaceState
     private const int _lineLength = 90;
     private readonly Stopwatch _raceTimer = new();
 
-    public RacerState State { get; private set; } = RacerState.NotStarted;
+    public RaceStatus Status { get; private set; } = RaceStatus.NotStarted;
     public const int LinesShownCount = 8;
     public const int Height = LinesShownCount + 1; // 1 for the "..." line / spacing
 
@@ -53,7 +53,7 @@ internal class RaceState
             TextToWindowWidthLines();
         }
 
-        if (State == RacerState.Finished) Results();
+        if (Status == RaceStatus.Finished) Results();
         else PrintRaceLines();
     }
 
@@ -88,10 +88,10 @@ internal class RaceState
 
     public void AddChar(char ch)
     {
-        if (State == RacerState.Finished) return;
-        else if (State == RacerState.NotStarted)
+        if (Status == RaceStatus.Finished) return;
+        else if (Status == RaceStatus.NotStarted)
         {
-            State = RacerState.InProgress;
+            Status = RaceStatus.InProgress;
             _raceTimer.Start();
         }
 
@@ -124,7 +124,7 @@ internal class RaceState
 
         if (_totalChars <= _typed.Count)
         {
-            State = RacerState.Finished;
+            Status = RaceStatus.Finished;
             _raceTimer.Stop();
         }
     }
@@ -259,7 +259,7 @@ internal class RaceState
         _currentLine = 0;
         _totalChars = 0;
         _raceTimer.Reset();
-        State = RacerState.NotStarted;
+        Status = RaceStatus.NotStarted;
     }
 
     private void ClearRows()
@@ -296,7 +296,7 @@ internal class RaceState
     }
 }
 
-internal enum RacerState
+internal enum RaceStatus
 {
     NotStarted,
     InProgress,
