@@ -56,36 +56,27 @@ internal static class Screen
         Console.WriteLine($"Terminal must be at least {MinHeight} rows, {MinWidth} cols.");
         Console.WriteLine("Press `Ctrl + L` to refresh.");
     }
-    
+
     public static bool ConfirmModal(string message)
     {
-        // TODO: The message should only be allowed to be a certain length.
-        //       If it's longer, it should be split into multiple lines.
-        //       Max width should be Console.WindowWidth - 10 or something.
-        // TODO: Make border dynamic that can be used for other modals.
-        if (message.Length > Console.WindowWidth - 10)
-        {
-            throw new ArgumentException("Message is too long.");
-        }
         HideCursor();
-        int modalWidth = message.Length + 2 + 2; // 2 for padding, 2 for border
-        int modalHeight = 7; // 3 for padding, 2 for border, 1 for message, 1 for Y/N
+
+        (string[] lines, int maxLength) = MessageToLines(message);
+        int modalWidth = maxLength + 2 + 2; // 2 for padding, 2 for border
+        int modalHeight = lines.Length + 3 + 2 + 1; // 3 for padding, 2 for border, 1 for Y/N
         int left = (Console.WindowWidth - modalWidth) / 2;
         int top = (Console.WindowHeight - modalHeight) / 2;
-        Console.SetCursorPosition(left, top);
-        Console.Write("╔" + new string('═', message.Length + 2) + "╗");
-        Console.SetCursorPosition(left, top + 1);
-        Console.Write("║ " + new string(' ', message.Length) + " ║");
-        Console.SetCursorPosition(left, top + 2);
-        Console.Write("║ " + message + " ║");
-        Console.SetCursorPosition(left, top + 3);
-        Console.Write("║ " + new string(' ', message.Length) + " ║");
-        Console.SetCursorPosition(left, top + 4);
-        Console.Write("║ " + "[Y]es / [N]o".PadLeft(message.Length) + " ║");
-        Console.SetCursorPosition(left, top + 5);
-        Console.Write("║ " + new string(' ', message.Length) + " ║");
-        Console.SetCursorPosition(left, top + 6);
-        Console.Write("╚" + new string('═', message.Length + 2) + "╝");
+
+        ModalBorder(left, top, modalWidth, modalHeight);
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            Console.SetCursorPosition(left + 2, top + 2 + i);
+            Console.Write(lines[i]);
+        }
+
+        Console.SetCursorPosition(left + modalWidth - 13 - 2, top + modalHeight - 3);
+        Console.Write("[Y]es / [N]o"); // Length 13 + 2 padding
 
         while (true)
         {
@@ -99,5 +90,46 @@ internal static class Screen
                 return false;
             }
         }
+    }
+
+    public static void ModalBorder(int left, int top, int width, int height)
+    {
+        Console.SetCursorPosition(left, top);
+        Console.Write("╔" + new string('═', width - 2) + "╗");
+
+        for (int i = 1; i < height - 1; i++)
+        {
+            Console.SetCursorPosition(left, top + i);
+            Console.Write("║" + new string(' ', width - 2) + "║");
+        }
+        
+        Console.SetCursorPosition(left, top + height - 1);
+        Console.Write("╚" + new string('═', width - 2) + "╝");
+    }
+
+    private static (string[] Lines, int MaxLength) MessageToLines(string message)
+    {
+        // TODO: Is Console.WindowWidth - 10 a good number?
+        if (message.Length <= Console.WindowWidth - 10)
+        {
+            return ([message], message.Length);
+        }
+
+        List<string> lines = [];
+        int maxLength = 0;
+
+        while (message.Length > Console.WindowWidth - 10)
+        {
+            int index = message.LastIndexOf(' ', Console.WindowWidth - 10);
+            string line = message[..index];
+            lines.Add(line);
+            if (line.Length > maxLength)
+            {
+                maxLength = line.Length;
+            }
+            message = message[(index + 1)..];
+        }
+
+        return ([.. lines], maxLength);
     }
 }

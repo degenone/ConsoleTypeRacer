@@ -224,6 +224,7 @@ internal class RaceState
         for (int i = 0; i < _text.Length; i++)
         {
             string line = _text[i];
+            if (string.IsNullOrWhiteSpace(line)) continue;
 
             while (line.Length > maxLineLength)
             {
