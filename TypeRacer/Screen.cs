@@ -64,6 +64,12 @@ internal static class Screen
         (string[] lines, int maxLength) = MessageToLines(message);
         int modalWidth = maxLength + 2 + 2; // 2 for padding, 2 for border
         int modalHeight = lines.Length + 3 + 2 + 1; // 3 for padding, 2 for border, 1 for Y/N
+
+        if (modalHeight > Console.WindowHeight - 4)
+        {
+            throw new InvalidOperationException("Message too long for modal.");
+        }
+
         int left = (Console.WindowWidth - modalWidth) / 2;
         int top = (Console.WindowHeight - modalHeight) / 2;
 

@@ -14,7 +14,11 @@
 // - [x] Finishing the race should not end the program, only Ctrl + Q should.
 // - [ ] Add a local DB to track scores.
 // - [ ] Add `Modes`, time trial, word count, accuracy, etc.
-//       I'm not sure if what to call these though.
+//       - I'm not sure if what to call these though.
+//       - When switching between `RaceType`s, if the type is already selected,
+//         it will change the mode.
+//       - Words will have a time trial, completion and accuracy modes. Quotes
+//         and programming languages will have completion and accuracy modes.
 // - [ ] Refactor the code to be more readable and see if I can seperate
 //       `RaceState` (or others) into smaller parts.
 // - [ ] Figure out what the final product looks like.
@@ -30,7 +34,7 @@ Keyboard keyboard = new(3);
 RaceType raceType = RaceType.EnWords;
 RaceFileHandler raceFileHandler = new();
 string[] text = raceFileHandler.GetTextFromRaceFile(raceType);
-RaceState race = new(text, 10);
+RaceState race = new(text, raceType, 10);
 
 Screen.Print(keyboard, race, raceType);
 
@@ -55,7 +59,7 @@ while (true)
     }
     else if (pressed.Key == ConsoleKey.R && pressed.Modifiers == ConsoleModifiers.Control)
     {
-        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
+        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
         Screen.Print(keyboard, race, raceType);
     }
     else if (pressed.Key == ConsoleKey.L && pressed.Modifiers == ConsoleModifiers.Control)
@@ -70,7 +74,7 @@ while (true)
         )
     {
         raceType = mode.Type;
-        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType));
+        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
         Screen.Print(keyboard, race, raceType);
     }
     else if (keyboard.RegisterPress(pressed.Key, pressed.Modifiers == ConsoleModifiers.Shift))

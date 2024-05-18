@@ -12,7 +12,7 @@ internal class RaceState
     /// <param name="rowOffset"></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public RaceState(string[] text, int rowOffset)
+    public RaceState(string[] text, RaceType raceType, int rowOffset)
     {
         if (text.Length == 0)
         {
@@ -24,11 +24,13 @@ internal class RaceState
         }
 
         _text = text;
+        _raceType = raceType;
         _rowOffset = rowOffset;
         TextToWindowWidthLines();
     }
 
     private string[] _text;
+    private RaceType _raceType;
     private readonly List<string> _lines = [];
     private readonly List<char> _typed = [];
     private readonly List<int> _errorsAt = [];
@@ -39,6 +41,7 @@ internal class RaceState
     private int _currentLine = 0;
     private const int _lineLength = 90;
     private readonly Stopwatch _raceTimer = new();
+    private const char _newLineChar = '⏎';
 
     public RaceStatus Status { get; private set; } = RaceStatus.NotStarted;
     public const int LinesShownCount = 8;
@@ -79,10 +82,11 @@ internal class RaceState
         }
     }
 
-    public void UpdateText(string[] text)
+    public void UpdateText(string[] text, RaceType raceType)
     {
         Reset();
         _text = text;
+        _raceType = raceType;
         TextToWindowWidthLines();
     }
 
@@ -120,6 +124,7 @@ internal class RaceState
             _currentPosition = 0;
             _currentLine++;
             PrintRaceLines();
+            Console.SetCursorPosition(0, _rowOffset + _currentLine % LinesShownCount);
         }
 
         if (_totalChars <= _typed.Count)
@@ -179,7 +184,8 @@ internal class RaceState
         Console.SetCursorPosition(pos, _rowOffset + line % LinesShownCount);
 
         char ch = _lines[line][pos];
-        bool correct = ch == typedCh;
+        // TODO: this might not work for non-windows systems.
+        bool correct = ch != _newLineChar ? ch == typedCh : typedCh == '\r';
 
         if (ch != ' ')
         {
@@ -220,6 +226,7 @@ internal class RaceState
         _lines.Clear();
 
         int maxLineLength = Math.Min(_lineLength, Console.WindowWidth - 1);
+        string lineEnding = _raceType != RaceType.EnWords ? _newLineChar.ToString() : " ";
 
         for (int i = 0; i < _text.Length; i++)
         {
@@ -241,9 +248,7 @@ internal class RaceState
 
             if (!string.IsNullOrWhiteSpace(line))
             {
-                // TODO: I want to make this a new line, at least for all code
-                // races, but maybe for all types.
-                if (i < _text.Length - 1) line += " ";
+                if (i < _text.Length - 1) line += lineEnding;
                 _totalChars += line.Length;
                 _lines.Add(line);
             }
