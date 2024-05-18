@@ -97,6 +97,7 @@ internal class RaceState
         {
             Status = RaceStatus.InProgress;
             _raceTimer.Start();
+            Screen.ShowCursor();
         }
 
         // TODO: If Tab is used incorrectly it can count upto 4 errors when it should be 1.

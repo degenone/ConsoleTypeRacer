@@ -36,6 +36,7 @@ RaceFileHandler raceFileHandler = new();
 string[] text = raceFileHandler.GetTextFromRaceFile(raceType);
 RaceState race = new(text, raceType, 10);
 
+Screen.HideCursor();
 Screen.Print(keyboard, race, raceType);
 
 int width = Console.WindowWidth;
@@ -53,7 +54,6 @@ while (true)
         }
         else
         {
-            Screen.ShowCursor();
             Screen.Print(keyboard, race, raceType);
         }
     }
@@ -97,7 +97,6 @@ while (true)
         }
         else
         {
-            Screen.ShowCursor();
             race.AddChar(pressed.KeyChar);
 
             if (race.Status == RaceStatus.Finished)
