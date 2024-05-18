@@ -23,10 +23,11 @@ internal static class Screen
         race.Print();
 
         // Footer
-        // TODO: This should be dynamic positioning below the race text, one line gap
-        // TODO: Ctrl + Q and Ctrl + W are maybe too close together for accidental quits.
+        // TODO: This should be dynamic positioning below the race text, one line gap?
+        Console.SetCursorPosition(0, Console.WindowHeight - 2);
+        Console.WriteLine("'Ctrl + R' to restart | 'Ctrl + L' to refresh");
         Console.SetCursorPosition(0, Console.WindowHeight - 1);
-        Console.Write($"Press 'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
+        Console.WriteLine($"'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
 
         Console.SetCursorPosition(0, Header.Height + Keyboard.Height);
     }
