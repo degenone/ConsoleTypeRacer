@@ -1,7 +1,7 @@
 ﻿namespace TypeRacer;
 internal static class Screen
 {
-    public const int MinHeight = Header.Height + Keyboard.Height + RaceState.Height + 2; // 2 for footer
+    public const int MinHeight = Header.Height + Keyboard.Height + RaceState.Height + 3; // 3 for footer
     public const int MinWidth = Keyboard.Width;
     public static void Print(Keyboard keyboard, RaceState race, RaceType raceType)
     {
@@ -25,9 +25,9 @@ internal static class Screen
         // Footer
         // TODO: This should be dynamic positioning below the race text, one line gap?
         Console.SetCursorPosition(0, Console.WindowHeight - 2);
-        Console.WriteLine("'Ctrl + R' to restart | 'Ctrl + L' to refresh");
+        Console.Write("'Ctrl + R' to restart | 'Ctrl + L' to refresh");
         Console.SetCursorPosition(0, Console.WindowHeight - 1);
-        Console.WriteLine($"'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
+        Console.Write($"'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
 
         Console.SetCursorPosition(0, Header.Height + Keyboard.Height);
     }
@@ -96,6 +96,52 @@ internal static class Screen
             {
                 return false;
             }
+        }
+    }
+
+    public static void MessageModal(string message)
+    {
+        (string[] lines, _) = MessageToLines(message);
+        MessageModal(lines);
+    }
+
+    public static void MessageModal(string[] messageLines)
+    {
+        HideCursor();
+
+        int maxLength = messageLines.Max(line => line.Length);
+        if (maxLength > Console.WindowWidth - 10)
+        {
+            throw new InvalidOperationException("Message too long for modal.");
+        }
+
+        int modalWidth = maxLength + 2 + 2; // 2 for padding, 2 for border
+        int modalHeight = messageLines.Length + 3 + 2; // 3 for padding, 2 for border
+
+        if (modalHeight > Console.WindowHeight - 4)
+        {
+            throw new InvalidOperationException("Message too long for modal.");
+        }
+
+        int left = (Console.WindowWidth - modalWidth) / 2;
+        int top = (Console.WindowHeight - modalHeight) / 2;
+
+        ModalBorder(left, top, modalWidth, modalHeight);
+
+        for (int i = 0; i < messageLines.Length; i++)
+        {
+            Console.SetCursorPosition(left + 2, top + 2 + i);
+            Console.Write(messageLines[i]);
+        }
+
+
+        Console.SetCursorPosition(left + modalWidth - 4 - 2, top + modalHeight - 3);
+        Console.Write("[O]k"); // Length 4 + 2 padding
+
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.O) break;
         }
     }
 

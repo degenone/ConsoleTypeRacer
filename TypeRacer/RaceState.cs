@@ -56,8 +56,7 @@ internal class RaceState
             TextToWindowWidthLines();
         }
 
-        if (Status == RaceStatus.Finished) Results();
-        else PrintRaceLines();
+        PrintRaceLines();
     }
 
     private void PrintRaceLines()
@@ -278,15 +277,12 @@ internal class RaceState
         }
     }
 
-    public void Results()
-    {
-        ClearRows();
-        Console.SetCursorPosition(0, _rowOffset);
-        Console.WriteLine("Results:");
-        Console.WriteLine($"Errors: {_errorsMade}");
-        Console.WriteLine($"Words per minute: {Wpm()}");
-        Console.WriteLine($"Accuracy: {Accuracy():0.00}%");
-    }
+    public string[] Results() => [
+            "Results:",
+            $"Errors: {_errorsMade}",
+            $"Words per minute: {Wpm()}",
+            $"Accuracy: {Accuracy():0.00}%"
+        ];
 
     private int Wpm()
     {

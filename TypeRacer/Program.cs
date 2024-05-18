@@ -101,8 +101,10 @@ while (true)
 
             if (race.Status == RaceStatus.Finished)
             {
-                race.Results();
                 Screen.HideCursor();
+                Screen.MessageModal(race.Results());
+                race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
+                Screen.Print(keyboard, race, raceType);
             }
         }
     }

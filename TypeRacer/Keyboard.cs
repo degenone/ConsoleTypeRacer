@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Security.Cryptography;
 
 namespace TypeRacer;
 internal class Keyboard(int rowOffset)
