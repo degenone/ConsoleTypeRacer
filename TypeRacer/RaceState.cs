@@ -12,7 +12,9 @@ internal class RaceState
     /// <param name="rowOffset"></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public RaceState(string[] text, RaceType raceType, int rowOffset)
+    public RaceState(string[] text,
+                     RaceType raceType,
+                     int rowOffset)
     {
         if (text.Length == 0)
         {
@@ -44,6 +46,7 @@ internal class RaceState
     private const char _newLineChar = '⏎';
 
     public RaceStatus Status { get; private set; } = RaceStatus.NotStarted;
+    public RaceKind Kind { get; private set; } = RaceKind.Completion;
     public const int LinesShownCount = 8;
     public const int Height = LinesShownCount + 1; // 1 for the "..." line / spacing
 
@@ -89,6 +92,8 @@ internal class RaceState
         TextToWindowWidthLines();
     }
 
+    public void UpdateRaceKind(RaceKind kind) => Kind = kind;
+
     public void AddChar(char ch)
     {
         if (Status == RaceStatus.Finished) return;
@@ -127,17 +132,27 @@ internal class RaceState
             Console.SetCursorPosition(0, _rowOffset + _currentLine % LinesShownCount);
         }
 
-        if (_totalChars <= _typed.Count)
+        if (RaceIsFinished())
         {
             Status = RaceStatus.Finished;
             _raceTimer.Stop();
         }
     }
 
+    private bool RaceIsFinished()
+    {
+        if (Kind == RaceKind.Completion && _totalChars <= _typed.Count)
+            return true;
+        else if (Kind == RaceKind.Accuracy && Accuracy() < 90) // TODO: make this a setting?
+            return true;
+        else if (Kind == RaceKind.TimeTrial && _raceTimer.Elapsed.TotalSeconds >= 30) // TODO: make this a setting?
+            return true;
+        return false;
+    }
+
     public void RemoveChar()
     {
         if (_typed.Count == 0) return;
-        if (_errorsAt.Count == 0 && _typed[^1] == ' ') return;
 
         _typed.RemoveAt(_typed.Count - 1);
         if (_errorsAt.Count > 0 && _errorsAt[^1] == _typed.Count)
@@ -159,16 +174,16 @@ internal class RaceState
     {
         if (_typed.Count == 0) return;
 
-        if (_typed[^1] == ' ')
+        if (_lines[_currentLine][_currentPosition - 1] == ' ')
         {
-            while (_typed.Count > 0 && _errorsAt.Count > 0 && _typed[^1] == ' ')
+            while (_typed.Count > 0 && _errorsAt.Count > 0 && _lines[_currentLine][_currentPosition - 1] == ' ')
             {
                 RemoveChar();
             }
         }
         else
         {
-            while (_typed.Count > 0 && _typed[^1] != ' ')
+            while (_typed.Count > 0 && _lines[_currentLine][_currentPosition - 1] != ' ')
             {
                 RemoveChar();
             }

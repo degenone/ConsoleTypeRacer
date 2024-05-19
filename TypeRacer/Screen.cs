@@ -14,7 +14,7 @@ internal static class Screen
         }
 
         // Header
-        Header.Print(raceType);
+        Header.Print(raceType, race.Kind);
 
         // Keyboard
         keyboard.Print();

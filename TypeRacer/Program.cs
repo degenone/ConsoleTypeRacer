@@ -1,7 +1,10 @@
 ﻿// Major TODOs:
 // - [x] Add 5-10 files for each game mode (quotes / programming languages).
 //      - [x] Quotes
-//      - [ ] Consider if it would be better to have them in actual c# files.
+//      - [x] Consider if it would be better to have them in actual c# files.
+//            - I think for extensibility, it would be better to have them as
+//              `.txt` files. Once built, they can be added to the program by
+//              placing them in appropriate folders.
 // - [x] Add scrolling to race text.
 // - [x] Add a timer (I don't think I want to show it, just for the final
 // score).
@@ -13,7 +16,7 @@
 // - [x] Results screen at the end of a race.
 // - [x] Finishing the race should not end the program, only Ctrl + Q should.
 // - [ ] Add a local DB to track scores.
-// - [ ] Add `Modes`, time trial, word count, accuracy, etc.
+// - [x] Add `Modes`, time trial, word count, accuracy, etc.
 //       - I'm not sure if what to call these though.
 //       - When switching between `RaceType`s, if the type is already selected,
 //         it will change the mode.
@@ -73,9 +76,19 @@ while (true)
         RaceModes.Modes.TryGetValue(pressed.Key, out RaceMode? mode)
         )
     {
-        raceType = mode.Type;
-        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
-        Screen.Print(keyboard, race, raceType);
+        if (raceType == mode.Type)
+        {
+            RaceKind kind = race.Kind.SwitchRaceKind(raceType);
+            race.UpdateRaceKind(kind);
+            Header.Print(raceType, kind);
+        }
+        else
+        {
+            raceType = mode.Type;
+            race.UpdateRaceKind(RaceKind.Completion);
+            race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
+            Screen.Print(keyboard, race, raceType);
+        }
     }
     else if (keyboard.RegisterPress(pressed.Key, pressed.Modifiers == ConsoleModifiers.Shift))
     {
