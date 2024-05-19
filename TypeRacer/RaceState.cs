@@ -13,26 +13,29 @@ internal class RaceState
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public RaceState(string[] text,
-                     RaceType raceType,
+                     RaceMode raceMode,
                      int rowOffset)
     {
         if (text.Length == 0)
         {
-            throw new ArgumentException("Text must contain at least one line.");
+            throw new ArgumentException(
+                "Text must contain at least one line.");
         }
         if (rowOffset < 0 || rowOffset >= Console.WindowHeight)
         {
-            throw new ArgumentOutOfRangeException(nameof(rowOffset), "Offset must be within the bounds of the console window.");
+            throw new ArgumentOutOfRangeException(
+                nameof(rowOffset),
+                "Offset must be within the bounds of the console window.");
         }
 
         _text = text;
-        _raceType = raceType;
+        _raceMode = raceMode;
         _rowOffset = rowOffset;
         TextToWindowWidthLines();
     }
 
     private string[] _text;
-    private RaceType _raceType;
+    private RaceMode _raceMode;
     private readonly List<string> _lines = [];
     private readonly List<char> _typed = [];
     private readonly List<int> _errorsAt = [];
@@ -46,7 +49,7 @@ internal class RaceState
     private const char _newLineChar = '⏎';
 
     public RaceStatus Status { get; private set; } = RaceStatus.NotStarted;
-    public RaceKind Kind { get; private set; } = RaceKind.Completion;
+    public RaceType Type { get; private set; } = RaceType.Completion;
     public const int LinesShownCount = 8;
     public const int Height = LinesShownCount + 1; // 1 for the "..." line / spacing
 
@@ -84,15 +87,15 @@ internal class RaceState
         }
     }
 
-    public void UpdateText(string[] text, RaceType raceType)
+    public void UpdateText(string[] text, RaceMode raceType)
     {
         Reset();
         _text = text;
-        _raceType = raceType;
+        _raceMode = raceType;
         TextToWindowWidthLines();
     }
 
-    public void UpdateRaceKind(RaceKind kind) => Kind = kind;
+    public void UpdateRaceType(RaceType type) => Type = type;
 
     public void AddChar(char ch)
     {
@@ -129,7 +132,8 @@ internal class RaceState
             _currentPosition = 0;
             _currentLine++;
             PrintRaceLines();
-            Console.SetCursorPosition(0, _rowOffset + _currentLine % LinesShownCount);
+            Console.SetCursorPosition(
+                0, _rowOffset + _currentLine % LinesShownCount);
         }
 
         if (RaceIsFinished())
@@ -141,11 +145,12 @@ internal class RaceState
 
     private bool RaceIsFinished()
     {
-        if (Kind == RaceKind.Completion && _totalChars <= _typed.Count)
+        if (_totalChars <= _typed.Count)
             return true;
-        else if (Kind == RaceKind.Accuracy && Accuracy() < 90) // TODO: make this a setting?
+        else if (Type == RaceType.Accuracy && Accuracy() < 90) // TODO: make this a setting?
             return true;
-        else if (Kind == RaceKind.TimeTrial && _raceTimer.Elapsed.TotalSeconds >= 30) // TODO: make this a setting?
+        else if (Type == RaceType.TimeTrial
+                 && _raceTimer.Elapsed.TotalSeconds >= 30) // TODO: make this a setting?
             return true;
         return false;
     }
@@ -174,25 +179,39 @@ internal class RaceState
     {
         if (_typed.Count == 0) return;
 
+        if (_currentPosition == 0)
+        {
+            if (_errorsAt.Count == 0) return;
+            RemoveChar();
+        }
+
         if (_lines[_currentLine][_currentPosition - 1] == ' ')
         {
-            while (_typed.Count > 0 && _errorsAt.Count > 0 && _lines[_currentLine][_currentPosition - 1] == ' ')
+            while (_typed.Count > 0
+                   && _errorsAt.Count > 0
+                   && _currentPosition > 0
+                   && _lines[_currentLine][_currentPosition - 1] == ' ')
             {
                 RemoveChar();
             }
         }
         else
         {
-            while (_typed.Count > 0 && _lines[_currentLine][_currentPosition - 1] != ' ')
+            while (_typed.Count > 0
+                   && _currentPosition > 0
+                   && _lines[_currentLine][_currentPosition - 1] != ' ')
             {
                 RemoveChar();
             }
         }
 
-        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine % LinesShownCount);
+        Console.SetCursorPosition(_currentPosition,
+                                  _rowOffset + _currentLine % LinesShownCount);
     }
 
-    private void HighlightCurrent() => HighlightChar(_currentLine, _currentPosition, _typed[^1]);
+    private void HighlightCurrent() => HighlightChar(_currentLine,
+                                                     _currentPosition,
+                                                     _typed[^1]);
 
     private void HighlightChar(int line, int pos, char typedCh)
     {
@@ -230,18 +249,22 @@ internal class RaceState
 
     private void Unhighlight()
     {
-        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine % LinesShownCount);
+        Console.SetCursorPosition(_currentPosition,
+                                  _rowOffset + _currentLine % LinesShownCount);
         Console.ResetColor();
         Console.Write(_lines[_currentLine][_currentPosition]);
-        Console.SetCursorPosition(_currentPosition, _rowOffset + _currentLine % LinesShownCount);
+        Console.SetCursorPosition(_currentPosition,
+                                  _rowOffset + _currentLine % LinesShownCount);
     }
 
     private void TextToWindowWidthLines()
     {
+        // TODO: maybe should enforce that there are spaces in the text?
         _lines.Clear();
 
         int maxLineLength = Math.Min(_lineLength, Console.WindowWidth - 1);
-        string lineEnding = _raceType != RaceType.EnWords ? _newLineChar.ToString() : " ";
+        string lineEnding = _raceMode
+                            != RaceMode.EnWords ? _newLineChar.ToString() : " ";
 
         for (int i = 0; i < _text.Length; i++)
         {
@@ -253,7 +276,8 @@ internal class RaceState
                 int lastSpace = line.LastIndexOf(' ', maxLineLength);
                 if (lastSpace == -1)
                 {
-                    throw new InvalidOperationException("Line contains no spaces and is too long to fit window.");
+                    throw new InvalidOperationException(
+                        "Line contains no spaces and is too long to fit window.");
                 }
                 // Add the line up to and including the last space
                 _lines.Add(line[..(lastSpace + 1)]);
@@ -301,10 +325,23 @@ internal class RaceState
 
     private int Wpm()
     {
-        // TODO: This is not the greatest measure of WPM, but it's a start.
-        //       With code it's a bit more difficult to measure.
+        // TODO: With code, I need to think more about how to measure WPM.
+        if (_typed.Count == 0) return 0;
+
         TimeSpan elapced = _raceTimer.Elapsed;
-        return (int)(_text.Select(l => l.Split(' ').Length).Sum() / elapced.TotalMinutes);
+        string typedText = string.Join("", _typed);
+
+        // TODO: There is a weird case, if you type all the words correctly but
+        //       never use space, does this count as 0 WPM?
+        // edge case: if only one word is typed and it's wrong.
+        if (
+            !typedText.Contains(' ') &&
+            typedText != _lines[0].Split(' ')[0]
+            ) return 0;
+
+        int typedWordCount = typedText.Split(' ').Length;
+        // TODO: Still not sure if this is correct. Needs more testing.
+        return (int)(typedWordCount / elapced.TotalSeconds * 60);
     }
 
     private double Accuracy()

@@ -24,6 +24,7 @@
 //         and programming languages will have completion and accuracy modes.
 // - [ ] Refactor the code to be more readable and see if I can seperate
 //       `RaceState` (or others) into smaller parts.
+//       - [ ] Check code style too.
 // - [ ] Figure out what the final product looks like.
 // - [x] Add 'Are you sure' confirm window, e.g. to quit.
 using System.Text;
@@ -34,13 +35,13 @@ Console.OutputEncoding = Encoding.UTF8;
 
 Keyboard keyboard = new(3);
 
-RaceType raceType = RaceType.EnWords;
+RaceMode raceMode = RaceMode.EnWords;
 RaceFileHandler raceFileHandler = new();
-string[] text = raceFileHandler.GetTextFromRaceFile(raceType);
-RaceState race = new(text, raceType, 10);
+string[] text = raceFileHandler.GetTextFromRaceFile(raceMode);
+RaceState raceState = new(text, raceMode, 10);
 
 Screen.HideCursor();
-Screen.Print(keyboard, race, raceType);
+Screen.Print(keyboard, raceState, raceMode);
 
 int width = Console.WindowWidth;
 int height = Console.WindowHeight;
@@ -48,7 +49,8 @@ while (true)
 {
     ConsoleKeyInfo pressed = Console.ReadKey(true);
 
-    if (pressed.Key == ConsoleKey.Q && pressed.Modifiers == ConsoleModifiers.Control)
+    if (pressed.Key == ConsoleKey.Q
+        && pressed.Modifiers == ConsoleModifiers.Control)
     {
         if (Screen.ConfirmModal("Are you sure you want to quit?"))
         {
@@ -57,67 +59,74 @@ while (true)
         }
         else
         {
-            Screen.Print(keyboard, race, raceType);
+            Screen.Print(keyboard, raceState, raceMode);
         }
     }
-    else if (pressed.Key == ConsoleKey.R && pressed.Modifiers == ConsoleModifiers.Control)
+    else if (pressed.Key == ConsoleKey.R
+             && pressed.Modifiers == ConsoleModifiers.Control)
     {
-        race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
-        Screen.Print(keyboard, race, raceType);
+        raceState.UpdateText(raceFileHandler.GetTextFromRaceFile(raceMode),
+                             raceMode);
+        Screen.Print(keyboard, raceState, raceMode);
     }
-    else if (pressed.Key == ConsoleKey.L && pressed.Modifiers == ConsoleModifiers.Control)
+    else if (pressed.Key == ConsoleKey.L
+             && pressed.Modifiers == ConsoleModifiers.Control)
     {
         width = Console.WindowWidth;
         height = Console.WindowHeight;
-        Screen.Print(keyboard, race, raceType);
+        Screen.Print(keyboard, raceState, raceMode);
     }
-    else if (
-        pressed.Modifiers == ConsoleModifiers.Control &&
-        RaceModes.Modes.TryGetValue(pressed.Key, out RaceMode? mode)
-        )
+    else if (pressed.Modifiers == ConsoleModifiers.Control
+             && RaceModes.Modes.TryGetValue(pressed.Key,
+                                            out RaceModeRecord? newRaceMode))
     {
-        if (raceType == mode.Type)
+        if (raceMode == newRaceMode.Mode)
         {
-            RaceKind kind = race.Kind.SwitchRaceKind(raceType);
-            race.UpdateRaceKind(kind);
-            Header.Print(raceType, kind);
+            RaceType kind = raceState.Type.SwitchRaceType(raceMode);
+            raceState.UpdateRaceType(kind);
+            Header.Print(raceMode, kind);
         }
         else
         {
-            raceType = mode.Type;
-            race.UpdateRaceKind(RaceKind.Completion);
-            race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
-            Screen.Print(keyboard, race, raceType);
+            raceMode = newRaceMode.Mode;
+            raceState.UpdateRaceType(RaceType.Completion);
+            raceState.UpdateText(raceFileHandler.GetTextFromRaceFile(raceMode),
+                                 raceMode);
+            Screen.Print(keyboard, raceState, raceMode);
         }
     }
-    else if (keyboard.RegisterPress(pressed.Key, pressed.Modifiers == ConsoleModifiers.Shift))
+    else if (keyboard.RegisterPress(pressed.Key,
+                                    pressed.Modifiers == ConsoleModifiers.Shift))
     {
         if (Console.WindowHeight != height || Console.WindowWidth != width)
         {
             height = Console.WindowHeight;
             width = Console.WindowWidth;
-            Screen.Print(keyboard, race, raceType);
+            Screen.Print(keyboard, raceState, raceMode);
         }
 
         if (pressed.Key == ConsoleKey.Backspace)
         {
-            if (pressed.Modifiers == ConsoleModifiers.Control) race.RemoveWord();
-            else race.RemoveChar();
+            if (pressed.Modifiers == ConsoleModifiers.Control)
+                raceState.RemoveWord();
+            else raceState.RemoveChar();
         }
-        else if (pressed.Key == ConsoleKey.W && pressed.Modifiers == ConsoleModifiers.Control)
+        else if (pressed.Key == ConsoleKey.W
+                 && pressed.Modifiers == ConsoleModifiers.Control)
         {
-            race.RemoveWord();
+            raceState.RemoveWord();
         }
         else
         {
-            race.AddChar(pressed.KeyChar);
+            raceState.AddChar(pressed.KeyChar);
 
-            if (race.Status == RaceStatus.Finished)
+            if (raceState.Status == RaceStatus.Finished)
             {
                 Screen.HideCursor();
-                Screen.MessageModal(race.Results());
-                race.UpdateText(raceFileHandler.GetTextFromRaceFile(raceType), raceType);
-                Screen.Print(keyboard, race, raceType);
+                Screen.MessageModal(raceState.Results());
+                raceState.UpdateText(
+                    raceFileHandler.GetTextFromRaceFile(raceMode), raceMode);
+                Screen.Print(keyboard, raceState, raceMode);
             }
         }
     }

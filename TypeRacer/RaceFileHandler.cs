@@ -4,16 +4,16 @@ internal class RaceFileHandler
     private readonly string assetsPath = Path.GetFullPath("./assets/");
     private readonly Random random = new();
 
-    public string[] GetTextFromRaceFile(RaceType raceType)
+    public string[] GetTextFromRaceFile(RaceMode raceType)
     {
         return raceType switch
         {
-            RaceType.EnWords => GetTextFromEnWordsFile(),
-            RaceType.Quotes => GetTextFromRandomFileFromDirectory("./Quotes/"),
+            RaceMode.EnWords => GetTextFromEnWordsFile(),
+            RaceMode.Quotes => GetTextFromRandomFileFromDirectory("./Quotes/"),
             //RaceType.Quotes => DebuggingExample(),
-            RaceType.Csharp => GetTextFromRandomFileFromDirectory("./Csharp/"),
-            RaceType.Python => GetTextFromRandomFileFromDirectory("./Python/"),
-            RaceType.React => GetTextFromRandomFileFromDirectory("./React/"),
+            RaceMode.Csharp => GetTextFromRandomFileFromDirectory("./Csharp/"),
+            RaceMode.Python => GetTextFromRandomFileFromDirectory("./Python/"),
+            RaceMode.React => GetTextFromRandomFileFromDirectory("./React/"),
             _ => throw new NotImplementedException("GetTextFromRaceFile: Should be unreachable")
         };
     }

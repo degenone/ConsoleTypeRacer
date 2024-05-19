@@ -3,19 +3,19 @@
 namespace TypeRacer;
 internal static class RaceModes
 {
-    public static readonly ImmutableDictionary<ConsoleKey, RaceMode> Modes = ImmutableDictionary.CreateRange(
-        new KeyValuePair<ConsoleKey, RaceMode>[] {
-            KeyValuePair.Create<ConsoleKey, RaceMode>(ConsoleKey.D1, new("Words", RaceType.EnWords)),
-            KeyValuePair.Create<ConsoleKey, RaceMode>(ConsoleKey.D2, new("Quotes", RaceType.Quotes)),
-            KeyValuePair.Create<ConsoleKey, RaceMode>(ConsoleKey.D3, new("C#", RaceType.Csharp)),
-            KeyValuePair.Create<ConsoleKey, RaceMode>(ConsoleKey.D4, new("Python", RaceType.Python)),
-            KeyValuePair.Create<ConsoleKey, RaceMode>(ConsoleKey.D5, new("React", RaceType.React))
+    public static readonly ImmutableDictionary<ConsoleKey, RaceModeRecord> Modes = ImmutableDictionary.CreateRange(
+        new KeyValuePair<ConsoleKey, RaceModeRecord>[] {
+            KeyValuePair.Create<ConsoleKey, RaceModeRecord>(ConsoleKey.D1, new("Words", RaceMode.EnWords)),
+            KeyValuePair.Create<ConsoleKey, RaceModeRecord>(ConsoleKey.D2, new("Quotes", RaceMode.Quotes)),
+            KeyValuePair.Create<ConsoleKey, RaceModeRecord>(ConsoleKey.D3, new("C#", RaceMode.Csharp)),
+            KeyValuePair.Create<ConsoleKey, RaceModeRecord>(ConsoleKey.D4, new("Python", RaceMode.Python)),
+            KeyValuePair.Create<ConsoleKey, RaceModeRecord>(ConsoleKey.D5, new("React", RaceMode.React))
         });
 }
 
-internal record RaceMode(string Name, RaceType Type);
+internal record RaceModeRecord(string Name, RaceMode Mode);
 
-internal enum RaceType
+internal enum RaceMode
 {
     EnWords,
     Quotes,

@@ -1,9 +1,9 @@
 ﻿namespace TypeRacer;
 internal static class Screen
 {
-    public const int MinHeight = Header.Height + Keyboard.Height + RaceState.Height + 3; // 3 for footer
+    public const int MinHeight = Header.Height + Keyboard.Height + RaceState.Height + 4; // 4 for footer
     public const int MinWidth = Keyboard.Width;
-    public static void Print(Keyboard keyboard, RaceState race, RaceType raceType)
+    public static void Print(Keyboard keyboard, RaceState raceState, RaceMode raceMode)
     {
         Console.Clear();
 
@@ -14,20 +14,22 @@ internal static class Screen
         }
 
         // Header
-        Header.Print(raceType, race.Kind);
+        Header.Print(raceMode, raceState.Type);
 
         // Keyboard
         keyboard.Print();
 
         // Text to race
-        race.Print();
+        raceState.Print();
 
         // Footer
         // TODO: This should be dynamic positioning below the race text, one line gap?
+        Console.SetCursorPosition(0, Console.WindowHeight - 3);
+        Console.Write($"'Ctrl + Q' to quit");
         Console.SetCursorPosition(0, Console.WindowHeight - 2);
         Console.Write("'Ctrl + R' to restart | 'Ctrl + L' to refresh");
         Console.SetCursorPosition(0, Console.WindowHeight - 1);
-        Console.Write($"'Ctrl + Q' to quit | 'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode");
+        Console.Write($"'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode or type of selected mode");
 
         Console.SetCursorPosition(0, Header.Height + Keyboard.Height);
     }
@@ -155,7 +157,7 @@ internal static class Screen
             Console.SetCursorPosition(left, top + i);
             Console.Write("║" + new string(' ', width - 2) + "║");
         }
-        
+
         Console.SetCursorPosition(left, top + height - 1);
         Console.Write("╚" + new string('═', width - 2) + "╝");
     }

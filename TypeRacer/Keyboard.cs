@@ -94,8 +94,6 @@ internal class Keyboard(int rowOffset)
         }
         Console.ResetColor();
         Console.Write("oldest");
-        //Console.SetCursorPosition(center - Width / 2, top + 3);
-        //Console.Write(new string('-', Width));
     }
 
     public bool RegisterPress(ConsoleKey pressed, bool shift)
@@ -144,3 +142,5 @@ internal class Keyboard(int rowOffset)
         else return new string(key.Chars);
     }
 }
+
+internal record Key(char[] Chars, int Column, int Row);
