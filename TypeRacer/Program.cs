@@ -55,6 +55,7 @@ while (true)
         if (Screen.ConfirmModal("Are you sure you want to quit?"))
         {
             Console.Clear();
+            Screen.ResetCursor();
             break;
         }
         else

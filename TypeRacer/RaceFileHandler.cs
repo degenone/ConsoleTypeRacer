@@ -1,8 +1,16 @@
 ﻿namespace TypeRacer;
 internal class RaceFileHandler
 {
-    private readonly string assetsPath = Path.GetFullPath("./assets/");
-    private readonly Random random = new();
+    private readonly Random _random = new();
+
+    private static string GetAssetsPath()
+    {
+        string? processDirName = Path.GetDirectoryName(Environment.ProcessPath);
+        if (string.IsNullOrEmpty(processDirName))
+            throw new InvalidOperationException(
+                "GetAssetsPath: Process directory name is null or empty");
+        return Path.GetFullPath(Path.Combine(processDirName, "./assets/"));
+    }
 
     public string[] GetTextFromRaceFile(RaceMode raceType)
     {
@@ -37,17 +45,18 @@ internal class RaceFileHandler
 
     private string[] GetTextFromRandomFileFromDirectory(string directory)
     {
-        var file = Directory.GetFiles(Path.Combine(assetsPath, directory))
-                            .OrderBy(x => random.Next())
+        var file = Directory
+                            .GetFiles(Path.Combine(GetAssetsPath(), directory))
+                            .OrderBy(x => _random.Next())
                             .First();
         return File.ReadAllLines(file);
     }
 
     private string[] GetTextFromEnWordsFile()
     {
-        string filePath = Path.Combine(assetsPath, "./words/en.txt");
+        string filePath = Path.Combine(GetAssetsPath(), "./words/en.txt");
         string[] lines = File.ReadAllLines(filePath);
-        random.Shuffle(lines);
+        _random.Shuffle(lines);
         return [string.Join(' ', lines[..100])];
     }
 }

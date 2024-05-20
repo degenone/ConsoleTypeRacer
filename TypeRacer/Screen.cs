@@ -54,6 +54,14 @@ internal static class Screen
         Console.CursorVisible = false;
     }
 
+    public static void ResetCursor()
+    {
+        Console.CursorVisible = true;
+#pragma warning disable CA1416 // Validate platform compatibility
+        Console.CursorSize = 100;
+#pragma warning restore CA1416 // Validate platform compatibility
+    }
+
     private static void Error()
     {
         Console.WriteLine($"Terminal must be at least {MinHeight} rows, {MinWidth} cols.");
