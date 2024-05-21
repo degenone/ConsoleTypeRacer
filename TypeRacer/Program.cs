@@ -69,6 +69,7 @@ while (true)
         raceState.UpdateText(raceFileHandler.GetTextFromRaceFile(raceMode),
                              raceMode);
         Screen.Print(keyboard, raceState, raceMode);
+        Screen.HideCursor();
     }
     else if (pressed.Key == ConsoleKey.L
              && pressed.Modifiers == ConsoleModifiers.Control)

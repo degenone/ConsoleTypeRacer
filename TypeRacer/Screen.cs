@@ -31,7 +31,7 @@ internal static class Screen
         Console.SetCursorPosition(0, Console.WindowHeight - 1);
         Console.Write($"'Ctrl + [1-{RaceModes.Modes.Count}]' to change mode or type of selected mode");
 
-        Console.SetCursorPosition(0, Header.Height + Keyboard.Height);
+        raceState.SetCursorPosition();
     }
 
     public static void ShowCursor()

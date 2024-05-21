@@ -140,6 +140,7 @@ internal class RaceState
         {
             Status = RaceStatus.Finished;
             _raceTimer.Stop();
+            Screen.HideCursor();
         }
     }
 
@@ -147,7 +148,7 @@ internal class RaceState
     {
         if (_totalChars <= _typed.Count)
             return true;
-        else if (Type == RaceType.Accuracy && Accuracy() < 90) // TODO: make this a setting?
+        else if (Type == RaceType.Accuracy && Accuracy() < 95) // TODO: make this a setting?
             return true;
         else if (Type == RaceType.TimeTrial
                  && _raceTimer.Elapsed.TotalSeconds >= 30) // TODO: make this a setting?
@@ -349,6 +350,9 @@ internal class RaceState
         // TODO: is this the correct measure for accuracy?
         return (1 - (double)_errorsMade / _typed.Count) * 100;
     }
+
+    internal void SetCursorPosition() => Console.SetCursorPosition(
+            _currentPosition, _rowOffset + _currentLine % LinesShownCount);
 }
 
 internal enum RaceStatus
