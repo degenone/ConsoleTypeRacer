@@ -327,6 +327,9 @@ internal class RaceState
     private int Wpm()
     {
         // TODO: With code, I need to think more about how to measure WPM.
+        // TODO: Improve Wpm calculation. Words don't have to be correct but
+        //       should be the same length (?) to be counted as a completed
+        //       word.
         if (_typed.Count == 0) return 0;
 
         TimeSpan elapced = _raceTimer.Elapsed;
