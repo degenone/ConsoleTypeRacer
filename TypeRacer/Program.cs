@@ -27,6 +27,10 @@
 //       - [ ] Check code style too.
 // - [ ] Figure out what the final product looks like.
 // - [x] Add 'Are you sure' confirm window, e.g. to quit.
+// - [ ] Convert this to use a TUI (Text User Interface) library.
+//       Choose between:
+//       - [ ] Terminal.Gui https://gui-cs.github.io/Terminal.Gui/index.html
+//       - [ ] Spectre.Console https://spectreconsole.net/
 using System.Text;
 using TypeRacer;
 
