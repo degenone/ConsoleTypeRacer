@@ -5,8 +5,6 @@ def hash_fraction(m, n):
     if n % P == 0:
         hash_value = sys.hash_info.inf
     else:
-        # Fermat's Little Theorem: pow(n, P-1, P) is 1, so
-        # pow(n, P-2, P) gives the inverse of n modulo P.
         hash_value = (abs(m) % P) * pow(n, P - 2, P) % P
     if m < 0:
         hash_value = -hash_value

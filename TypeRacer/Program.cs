@@ -31,6 +31,8 @@
 //       Choose between:
 //       - [ ] Terminal.Gui https://gui-cs.github.io/Terminal.Gui/index.html
 //       - [ ] Spectre.Console https://spectreconsole.net/
+// BUG: (in a C# file) if line only contains `{` (or`}`), it will count a new
+//      line as an error (new line after the character).
 using System.Text;
 using TypeRacer;
 
