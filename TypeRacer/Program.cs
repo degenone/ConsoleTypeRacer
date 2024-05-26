@@ -33,6 +33,7 @@
 //       - [ ] Spectre.Console https://spectreconsole.net/
 // BUG: (in a C# file) if line only contains `{` (or`}`), it will count a new
 //      line as an error (new line after the character).
+// BUG: should not be able to <BS> if no erros and last char is a space.
 using System.Text;
 using TypeRacer;
 
