@@ -159,6 +159,15 @@ internal class RaceState
     public void RemoveChar()
     {
         if (_typed.Count == 0) return;
+        if (
+            _lines[_currentLine][_currentPosition - 1] == ' ' &&
+            _errorsAt.Count == 0
+            )
+        {
+            Console.SetCursorPosition(_currentPosition,
+                _rowOffset + _currentLine % LinesShownCount);
+            return;
+        }
 
         _typed.RemoveAt(_typed.Count - 1);
         if (_errorsAt.Count > 0 && _errorsAt[^1] == _typed.Count)
