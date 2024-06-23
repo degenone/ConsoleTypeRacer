@@ -120,7 +120,10 @@ internal class RaceState
         _typed.Add(ch);
         HighlightCurrent();
 
-        if (!(ch == _lines[_currentLine][_currentPosition]))
+        bool correct = _lines[_currentLine][_currentPosition] != _newLineChar ?
+            ch == _lines[_currentLine][_currentPosition] :
+            ch == '\r';
+        if (!correct)
         {
             _errorsAt.Add(_typed.Count - 1);
             _errorsMade++;
@@ -160,8 +163,9 @@ internal class RaceState
     {
         if (_typed.Count == 0) return;
         if (
-            _lines[_currentLine][_currentPosition - 1] == ' ' &&
-            _errorsAt.Count == 0
+            _errorsAt.Count == 0 &&
+            (_currentPosition == 0 ||
+            _lines[_currentLine][_currentPosition - 1] == ' ')
             )
         {
             Console.SetCursorPosition(_currentPosition,
@@ -191,7 +195,13 @@ internal class RaceState
 
         if (_currentPosition == 0)
         {
-            if (_errorsAt.Count == 0) return;
+            if (_errorsAt.Count == 0)
+            {
+                Console.SetCursorPosition(
+                    _currentPosition,
+                    _rowOffset + _currentLine % LinesShownCount);
+                return;
+            }
             RemoveChar();
         }
 
