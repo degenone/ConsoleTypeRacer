@@ -31,6 +31,8 @@
 //       Choose between:
 //       - [ ] Terminal.Gui https://gui-cs.github.io/Terminal.Gui/index.html
 //       - [ ] Spectre.Console https://spectreconsole.net/
+// BUG: if a race is running and player cancels `Ctrl + Q`, the cursor does not
+//      show up again.
 using System.Text;
 using TypeRacer;
 
